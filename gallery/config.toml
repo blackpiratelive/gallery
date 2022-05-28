@@ -15,6 +15,7 @@ theme = "autophugo"
 
 [params]
     # Meta
+    favicon = "https://raw.githubusercontent.com/blackpiratelive/blackpiratelive.github.io/main/media/fevicon.svg"
     description = "A photo Gallery By BlackPirateX"
     keywords = "gallery, photogallery, blackpiratex"
     #msvalidate = ""
@@ -23,7 +24,7 @@ theme = "autophugo"
     thumb_quality = 50
     full_width = 960
     full_quality = 100
-    column_count = 3
+    column_count = 2
     #breadcrumb_use_title = false
     filename_as_phototitle = true
     images_downloadable = true
