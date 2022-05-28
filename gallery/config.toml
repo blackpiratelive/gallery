@@ -28,7 +28,7 @@ theme = "autophugo"
     #breadcrumb_use_title = false
     filename_as_phototitle = true
     images_downloadable = true
-    images_downloadable_use_orig = false
+    images_downloadable_use_orig = true
     taxonomies_links = true
 
     # Headerbar links
