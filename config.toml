@@ -1,0 +1,9 @@
+baseURL = 'https://gallery.blackpiratex.com/'
+languageCode = 'en-us'
+title = 'Gallery By BlackPirateX'
+theme = 'gallerytheme'
+
+[imaging]
+    anchor = 'Smart'
+    quality = 25
+    resampleFilter = 'Box'

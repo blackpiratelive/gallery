@@ -1,0 +1,31 @@
+{{- partial "head.html" . -}}
+{{- partial "header.html" . -}}
+<div class="all-content">
+
+    <h1 class="post-title">{{ .Title }}</h1>
+    <p class="author">Posted on
+        {{ .Date.Format "January 02, 2006" }}</p>
+
+    {{ .Content }}
+    <div class="gallery-page" id="mygallery">
+        {{- range $img := .Resources.ByType "image" }}
+            {{ with $img }}
+
+                {{ $img := $img.Resize "500x" }}
+                <div class="gallery-item">
+                <a href="{{ .RelPermalink }}" class="image-link">
+                    <img src="{{ $img.RelPermalink }}" loading="lazy">
+                </a>
+            </div>
+            {{ end }}
+        {{ end }}
+    </div>
+    <p class="author">
+        This album is tagged with:
+        {{ range (.GetTerms "tags") }}
+            <span>
+                <a href="{{ .Permalink }}">{{ .LinkTitle }}</a>,</span>
+        {{ end }}
+    </p>
+</div>
+{{- partial "footer.html" . -}}</body></html>

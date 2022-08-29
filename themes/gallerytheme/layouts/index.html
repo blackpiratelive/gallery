@@ -1,0 +1,24 @@
+{{- partial "head.html" . -}}
+<body>
+    {{- partial "header.html" . -}}
+    <div class="all-content">
+        <h4 class="description">{{ .Site.Params.description }}</h4>
+        <div class="posts">
+            <p class="author">Press CTRL+F to search</p>
+            <p class="author"><a href="/index.xml">Subscribe via RSS</a></p>
+                {{- range.RegularPages }}
+                    <a href="{{ .RelPermalink }}" class="image-link">
+                    {{ $featured := .Resources.GetMatch "*.jpg" }}
+                    {{ $featured := $featured.Crop "4000x3000" }}
+                    {{ $featured := $featured.Resize "800x" }}
+                    <div class="home-thumb">
+                    <img src="{{ $featured.RelPermalink }}" alt="" class="image-link">
+                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                </div>
+                    </a>
+            {{ end -}}
+    </div>
+    {{- partial "footer.html" . -}}
+</div>
+
+<body></html>
