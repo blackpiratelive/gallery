@@ -10,11 +10,11 @@
     <div class="gallery-page" id="mygallery">
         {{- range $img := .Resources.ByType "image" }}
             {{ with $img }}
-
                 {{ $img := $img.Resize "500x" }}
+               
                 <div class="gallery-item">
                 <a href="{{ .RelPermalink }}" class="image-link">
-                    <img src="{{ $img.RelPermalink }}" loading="lazy">
+                    <img src="{{ $img.RelPermalink }}" loading="lazy" class="gallery-img-thumb">
                 </a>
             </div>
             {{ end }}
