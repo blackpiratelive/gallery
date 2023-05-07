@@ -1,11 +1,18 @@
 {{- partial "head.html" . -}}
 {{- partial "header.html" . -}}
+{{ $featured1 := .Resources.GetMatch "*.jpg" }}
+{{ $name := $featured1.Name }}
+{{ $name = replace $name "-" " " }}
+{{ $name = replace $name "_" " " }}
+{{ $name = replace $name ".jpg" "" }}
+{{ $name = replace $name ".jpeg" "" }}
+{{ $name = replace $name ".png" "" }}
+{{ $name = title $name }}
 <div class="all-content">
 
-    <h1 class="post-title">{{ .Title }}</h1>
+    <h1 class="post-title">{{ $name }}</h1>
     <p class="author">Captured on
         {{ .Date.Format "January 02, 2006" }}</p>
-
     {{ .Content }}
     <div class="gallery-page" id="mygallery">
         {{- range $img := .Resources.ByType "image" }}

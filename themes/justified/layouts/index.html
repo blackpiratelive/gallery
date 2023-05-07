@@ -4,8 +4,7 @@
 {{- range.RegularPages }}
                     
     {{ $featured1 := .Resources.GetMatch "*.jpg" }}
-    {{ $featured := $featured1.Crop "4000x3000" }}
-    {{ $featured := $featured.Resize "800x" }}
+    {{ $featured := $featured1.Resize "800x" }}
     {{ $name := $featured1.Name }}
     {{ $name = replace $name "-" " " }}
     {{ $name = replace $name "_" " " }}
