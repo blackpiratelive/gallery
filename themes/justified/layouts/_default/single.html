@@ -28,8 +28,7 @@
 <div class="all-content">
 
     <h1 class="post-title">{{ $name }}</h1>
-    <p class="author">Captured on
-        {{ .Date.Format "January 02, 2006" }}</p>
+    <br>
     {{ .Content }}
     <div class="gallery-page" id="mygallery">
         {{- range $img := .Resources.ByType "image" }}
@@ -42,6 +41,26 @@
             {{ end }}
         {{ end }}
     </div>
+
+<!-- Camera information -->
+<div class="camera-info">
+    {{ with $featured1.Exif }}
+    <ul>
+        {{ with .Date }}<li>Date: {{ .Format "January 02, 2006 at 03:04 PM" }}</li>{{ end }}
+        {{ with .Tags.ApertureValue }}<li>Aperture: {{ lang.FormatNumber 2 . }}</li>{{ end }}
+        {{ with .Tags.ExposureTime }}<li>Exposure Time: {{ . }}s</li>{{ end }}
+        {{ with .Tags.FNumber }}<li>F Number: {{ . }}</li>{{ end }}
+        {{ with .Tags.FocalLength }}<li>Focal Length: {{ . }}</li>{{ end }}
+        {{ with .Tags.ISOSpeedRatings }}<li>ISO Speed Ratings: {{ . }}</li>{{ end }}
+        {{ with .Tags.LensModel }}<li>Lens Model: {{ . }}</li>{{ end }}
+        {{ with .Tags.Model }}<li>Camera Model: {{ . }}</li>{{ end }}
+      </ul>    
+    {{ end }}
+</div>
+
+
+
+
     <p class="author">
         This image is tagged with:
         {{ range (.GetTerms "tags") }}
