@@ -13,7 +13,7 @@
     {{ $name = replace $name ".png" "" }}
     {{ $name = title $name }}
 <a href="{{ .RelPermalink }}">
-    <img src="{{ $featured.RelPermalink }}" alt="{{ $name }}">
+    <img src="{{ $featured.RelPermalink }}" alt="{{ $name }}" width="{{ $featured.Width }}" height="{{ $featured.Height }}">
 </a>
 
 {{ end }}
