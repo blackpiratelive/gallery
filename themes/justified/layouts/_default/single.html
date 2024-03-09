@@ -3,6 +3,7 @@
 {{ $name = replace $name "-" " " }}
 {{ $name = replace $name "_" " " }}
 {{ $name = replace $name ".jpg" "" }}
+{{ $name = replace $name ".JPG" "" }}
 {{ $name = replace $name ".jpeg" "" }}
 {{ $name = replace $name ".png" "" }}
 {{ $name = title $name }}
@@ -42,7 +43,7 @@
         {{ end }}
     </div>
     <p class="author">
-        This album is tagged with:
+        This image is tagged with:
         {{ range (.GetTerms "tags") }}
             <span>
                 <a href="{{ .Permalink }}">{{ .LinkTitle }}</a>,</span>
