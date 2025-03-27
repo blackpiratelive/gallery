@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>House on Gallery By BlackPirateX</title>
+    <link>http://localhost:1313/tags/house/</link>
+    <description>Recent content in House on Gallery By BlackPirateX</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 May 2022 15:57:56 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/house/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Cityscapes</title>
+      <link>http://localhost:1313/049/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/049/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>The Golden Hour</title>
+      <link>http://localhost:1313/039/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/039/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>The Golden Hour</title>
+      <link>http://localhost:1313/040/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/040/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>The Golden Hour</title>
+      <link>http://localhost:1313/041/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/041/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>The Golden Hour</title>
+      <link>http://localhost:1313/044/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/044/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>The Golden Hour</title>
+      <link>http://localhost:1313/045/</link>
+      <pubDate>Sat, 28 May 2022 15:57:56 +0530</pubDate>
+      <guid>http://localhost:1313/045/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

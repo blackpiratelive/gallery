@@ -47,7 +47,7 @@
     {{ with $featured1.Exif }}
     <ul>
         {{ with .Date }}<li>Date: {{ .Format "January 02, 2006 at 03:04 PM" }}</li>{{ end }}
-        {{ with .Tags.ApertureValue }}<li>Aperture: {{ lang.FormatNumber 2 . }}</li>{{ end }}
+        {{ with .Tags.ApertureValue }}<li>Aperture: </li>{{ end }}
         {{ with .Tags.ExposureTime }}<li>Exposure Time: {{ . }}s</li>{{ end }}
         {{ with .Tags.FNumber }}<li>F Number: {{ . }}</li>{{ end }}
         {{ with .Tags.FocalLength }}<li>Focal Length: {{ . }}</li>{{ end }}
