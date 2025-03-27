@@ -2,6 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-03-27T20:09:43+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/the-red-car/</loc>
+    <lastmod>2025-03-27T20:09:43+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/light-works/</loc>
+    <lastmod>2025-03-27T20:09:15+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bhutan-mandir/</loc>
+    <lastmod>2025-03-27T20:08:42+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tree-and-factory/</loc>
+    <lastmod>2025-03-27T20:08:04+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/truck-in-bhutan/</loc>
+    <lastmod>2025-03-27T20:07:27+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/saraswati-at-bankura-christian-college/</loc>
+    <lastmod>2025-03-27T20:06:07+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/saraswati-1/</loc>
+    <lastmod>2025-03-27T19:49:29+05:30</lastmod>
+  </url><url>
     <loc>http://localhost:1313/amachu-bridge-bhutan-2/</loc>
     <lastmod>2024-09-26T15:57:56+05:30</lastmod>
   </url><url>
@@ -18,9 +42,6 @@
     <lastmod>2024-09-26T15:57:56+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/birds/</loc>
-    <lastmod>2024-09-26T15:57:56+05:30</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/</loc>
     <lastmod>2024-09-26T15:57:56+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/nature/</loc>
