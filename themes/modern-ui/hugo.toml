@@ -3,3 +3,12 @@ languageCode = 'en-us'
 title = 'My Photo Gallery'
 theme = 'modern-ui'
 
+
+
+[caches]
+  [caches.images]
+    dir = ':resourceDir/_gen'
+    maxAge = -1 # Cache forever
+  [caches.assets]
+    dir = ':resourceDir/_gen'
+    maxAge = -1 # Cache forever
