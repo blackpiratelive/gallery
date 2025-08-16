@@ -1,25 +1,16 @@
 {{ define "main" }}
-    {{/* Determine which pages to show based on the context */}}
-    {{ $pagesToList := .Pages }}
-    {{ if .IsHome }}
-        {{ $pagesToList = where .Site.RegularPages "Kind" "page" }}
-    {{ end }}
-
-    {{/* Render a gallery for the homepage, sections, or specific tag/category pages */}}
-    {{ if or .IsHome .IsSection .IsTerm }}
+    {{/* For a specific tag/category page, show a gallery of its photos */}}
+    {{ if .IsTerm }}
+        <h1 class="text-3xl font-bold mb-6">Photos tagged with: {{ .Title }}</h1>
         <div id="photo-gallery" class="justified-gallery">
-            {{ range $pagesToList }}
+            {{ range .Pages }}
                 {{ $image := .Resources.GetMatch "*.*" }}
                 {{ if $image }}
                     {{ $thumbnail := $image.Fill "400x300" }}
                     {{ $fullImage := $image.RelPermalink }}
                     {{ $dominantColor := index ($image.Fill "1x1 q1").Colors 0 }}
-                    
-                    {{/* Safely handle the tags parameter to prevent errors */}}
                     {{ $tags := "" }}
-                    {{ if .Params.tags }}
-                        {{ $tags = delimit .Params.tags ", " }}
-                    {{ end }}
+                    {{ if .Params.tags }}{{ $tags = delimit .Params.tags ", " }}{{ end }}
 
                     <a href="{{ $fullImage }}"
                        class="gallery-link"
@@ -37,12 +28,12 @@
                 {{ end }}
             {{ end }}
         </div>
-    {{/* For a taxonomy list page (like /tags/), render a list of the terms */}}
+    {{/* For a taxonomy list page (like /tags/), show a list of all terms */}}
     {{ else if .IsTaxonomy }}
         <h1 class="text-3xl font-bold mb-4">{{ .Title }}</h1>
         <ul>
             {{ range .Data.Terms.ByCount }}
-                <li>
+                <li class="mb-2">
                     <a href="{{ .Page.Permalink }}" class="text-blue-600 dark:text-blue-400 hover:underline text-lg">
                         {{ .Page.Title }} ({{ .Count }})
                     </a>
