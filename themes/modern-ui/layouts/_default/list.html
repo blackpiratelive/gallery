@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div id="photo-gallery" class="justified-gallery">
-    {{/* Range through all regular pages of the site */}}
-    {{ range .Site.RegularPages }}
+    {{/* Range through only the regular content pages (your photos) */}}
+    {{ range where .Site.RegularPages "Kind" "page" }}
         {{/* Find the first image resource in the page bundle */}}
         {{ $image := .Resources.GetMatch "*.*" }}
         {{ if $image }}
@@ -19,7 +19,7 @@
                data-description="{{ .Content | plainify }}"
                data-author="{{ .Params.author }}"
                data-author-link="{{ .Params.author_link }}"
-               data-tags="{{ delimit .Params.tags ", " }}"
+               data-tags="{{ with .Params.tags }}{{ delimit . ", " }}{{ end }}"
                data-color="{{ $dominantColor }}">
                 <img src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}">
             </a>
