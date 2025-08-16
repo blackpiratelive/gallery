@@ -1,0 +1,33 @@
+{{ define "main" }}
+<div id="photo-gallery" class="justified-gallery">
+    {{/* Range through only the regular content pages (your photos) to build the gallery */}}
+    {{ range where .Site.RegularPages "Kind" "page" }}
+        {{ $image := .Resources.GetMatch "*.*" }}
+        {{ if $image }}
+            {{ $thumbnail := $image.Fill "400x300" }}
+            {{ $fullImage := $image.RelPermalink }}
+            {{ $dominantColor := index ($image.Fill "1x1 q1").Colors 0 }}
+            
+            {{/* Safely handle the tags parameter */}}
+            {{ $tags := "" }}
+            {{ if .Params.tags }}
+                {{ $tags = delimit .Params.tags ", " }}
+            {{ end }}
+
+            <a href="{{ $fullImage }}"
+               class="gallery-link"
+               data-id="{{ .File.UniqueID }}"
+               data-src="{{ $fullImage }}"
+               data-thumbnail="{{ $thumbnail.RelPermalink }}"
+               data-title="{{ .Title }}"
+               data-description="{{ .Content | plainify }}"
+               data-author="{{ .Params.author }}"
+               data-author-link="{{ .Params.author_link }}"
+               data-tags="{{ $tags }}"
+               data-color="{{ $dominantColor }}">
+                <img src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}">
+            </a>
+        {{ end }}
+    {{ end }}
+</div>
+{{ end }}
