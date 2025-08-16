@@ -3,12 +3,3 @@ languageCode = 'en-us'
 title = 'My Photo Gallery'
 theme = 'modern-ui'
 
-[build]
-  [build.buildStats]
-    enable = true
-  [build.processing]
-    [build.processing.css]
-      [build.processing.css.tailwind]
-        [build.processing.css.tailwind.vars]
-          tailwindcss = "tailwindcss"
-          autoprefixer = "autoprefixer"
