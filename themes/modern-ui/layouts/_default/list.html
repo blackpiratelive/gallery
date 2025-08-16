@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div id="photo-gallery" class="justified-gallery">
-    {{/* Range through all pages in the 'photos' section */}}
-    {{ range where .Site.RegularPages "Section" "photos" }}
+    {{/* Range through all regular pages of the site */}}
+    {{ range .Site.RegularPages }}
         {{/* Find the first image resource in the page bundle */}}
         {{ $image := .Resources.GetMatch "*.*" }}
         {{ if $image }}
