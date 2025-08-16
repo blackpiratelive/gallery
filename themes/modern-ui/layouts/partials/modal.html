@@ -1,0 +1,35 @@
+<div id="fullscreen-modal" class="modal-closed fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden" onclick="closeModalOnClick(event)">
+    <div id="modal-bg"></div>
+    <div id="modal-content" class="bg-white/10 backdrop-blur-lg rounded-lg shadow-2xl w-full max-w-7xl h-full max-h-[90vh] flex flex-col md:flex-row overflow-hidden">
+        <div id="image-container" class="relative w-full md:w-3/4 h-1/2 md:h-full flex items-center justify-center p-2 transition-all duration-300">
+            <img id="fullscreen-image" src="" alt="Fullscreen Image" class="max-w-full max-h-full object-contain" crossorigin="anonymous">
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <button id="show-sidebar-btn" class="gallery-control-btn rounded-full w-10 h-10 hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                </button>
+                <button id="close-modal-btn" class="gallery-control-btn rounded-full w-10 h-10 text-2xl">&times;</button>
+            </div>
+            <button id="prev-btn" class="gallery-control-btn top-1/2 -translate-y-1/2 left-4 rounded-full w-11 h-11"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <button id="next-btn" class="gallery-control-btn top-1/2 -translate-y-1/2 right-4 rounded-full w-11 h-11"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+        <div id="sidebar-container" class="w-full md:w-1/4 h-1/2 md:h-full p-6 overflow-y-auto transition-all duration-300" style="background-color: rgba(0,0,0,0.2)">
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="image-title" class="text-2xl font-bold pr-2 text-white"></h2>
+                <button id="sidebar-toggle-btn" class="text-white/70 hover:text-white transition-colors p-2 rounded-full flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+            </div>
+            <div id="sidebar-content">
+                <p id="image-description" class="text-white/80 mb-6"></p>
+                <div class="mb-6">
+                    <h3 class="font-semibold text-lg mb-2 border-b pb-1 border-white/20 text-white">Tags</h3>
+                    <div id="image-tags" class="flex flex-wrap gap-2"></div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2 border-b pb-1 border-white/20 text-white">Photographer</h3>
+                    <div id="image-user" class="text-sm text-white/80"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
