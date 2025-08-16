@@ -1,29 +1,53 @@
 {{ define "main" }}
-<div id="photo-gallery" class="justified-gallery">
-    {{/* Range through only the regular content pages (your photos) */}}
-    {{ range where .Site.RegularPages "Kind" "page" }}
-        {{/* Find the first image resource in the page bundle */}}
-        {{ $image := .Resources.GetMatch "*.*" }}
-        {{ if $image }}
-            {{/* Create a thumbnail and get image info */}}
-            {{ $thumbnail := $image.Fill "400x300" }}
-            {{ $fullImage := $image.RelPermalink }}
-            {{ $dominantColor := index ($image.Fill "1x1 q1").Colors 0 }}
-
-            <a href="{{ $fullImage }}"
-               class="gallery-link"
-               data-id="{{ .File.UniqueID }}"
-               data-src="{{ $fullImage }}"
-               data-thumbnail="{{ $thumbnail.RelPermalink }}"
-               data-title="{{ .Title }}"
-               data-description="{{ .Content | plainify }}"
-               data-author="{{ .Params.author }}"
-               data-author-link="{{ .Params.author_link }}"
-               data-tags="{{ with .Params.tags }}{{ delimit . ", " }}{{ end }}"
-               data-color="{{ $dominantColor }}">
-                <img src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}">
-            </a>
-        {{ end }}
+    {{/* Determine which pages to show based on the context */}}
+    {{ $pagesToList := .Pages }}
+    {{ if .IsHome }}
+        {{ $pagesToList = where .Site.RegularPages "Kind" "page" }}
     {{ end }}
-</div>
+
+    {{/* Render a gallery for the homepage, sections, or specific tag/category pages */}}
+    {{ if or .IsHome .IsSection .IsTerm }}
+        <div id="photo-gallery" class="justified-gallery">
+            {{ range $pagesToList }}
+                {{ $image := .Resources.GetMatch "*.*" }}
+                {{ if $image }}
+                    {{ $thumbnail := $image.Fill "400x300" }}
+                    {{ $fullImage := $image.RelPermalink }}
+                    {{ $dominantColor := index ($image.Fill "1x1 q1").Colors 0 }}
+                    
+                    {{/* Safely handle the tags parameter to prevent errors */}}
+                    {{ $tags := "" }}
+                    {{ if .Params.tags }}
+                        {{ $tags = delimit .Params.tags ", " }}
+                    {{ end }}
+
+                    <a href="{{ $fullImage }}"
+                       class="gallery-link"
+                       data-id="{{ .File.UniqueID }}"
+                       data-src="{{ $fullImage }}"
+                       data-thumbnail="{{ $thumbnail.RelPermalink }}"
+                       data-title="{{ .Title }}"
+                       data-description="{{ .Content | plainify }}"
+                       data-author="{{ .Params.author }}"
+                       data-author-link="{{ .Params.author_link }}"
+                       data-tags="{{ $tags }}"
+                       data-color="{{ $dominantColor }}">
+                        <img src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}">
+                    </a>
+                {{ end }}
+            {{ end }}
+        </div>
+    {{/* For a taxonomy list page (like /tags/), render a list of the terms */}}
+    {{ else if .IsTaxonomy }}
+        <h1 class="text-3xl font-bold mb-4">{{ .Title }}</h1>
+        <ul>
+            {{ range .Data.Terms.ByCount }}
+                <li>
+                    <a href="{{ .Page.Permalink }}" class="text-blue-600 dark:text-blue-400 hover:underline text-lg">
+                        {{ .Page.Title }} ({{ .Count }})
+                    </a>
+                </li>
+            {{ end }}
+        </ul>
+    {{ end }}
 {{ end }}
