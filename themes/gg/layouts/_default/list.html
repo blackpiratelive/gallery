@@ -29,11 +29,11 @@
 
                     {{ if $image }}
                         <!-- 
-                            **DEBUGGING STEP**: Reverted to using the original image.
-                            If this works, it means Hugo's image processing is failing,
-                            likely due to a missing library (like libwebp) on your system.
+                            **FIX**: Switched from .Permalink to .RelPermalink.
+                            This generates a site-relative URL for the image, which is
+                            often more reliable than the absolute .Permalink.
                         -->
-                        <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
+                        <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
                     {{ else }}
                         <!-- Fallback if no image is found -->
                         <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
