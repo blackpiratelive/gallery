@@ -1,7 +1,7 @@
 baseURL = 'https://gallery.blackpiratex.com/'
 languageCode = 'en-us'
 title = 'Gallery By BlackPirateX'
-theme = 'justified'
+theme = 'gg'
 
 [imaging]
     anchor = 'Smart'
