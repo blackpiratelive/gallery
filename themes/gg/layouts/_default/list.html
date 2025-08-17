@@ -1,0 +1,61 @@
+<!-- layouts/_default/list.html -->
+<!-- This file is for the main gallery page that shows all your items. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Site.Title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold">{{ .Site.Title }}</h1>
+            <p class="text-xl text-gray-600">{{ .Site.Params.description }}</p>
+        </header>
+
+        <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- 
+                We loop through all the pages in the content directory.
+                The structure you have is a good example of Page Bundles in Hugo.
+                Each numbered folder is a "Leaf Bundle".
+            -->
+            {{ range .Pages }}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out">
+                <a href="{{ .Permalink }}">
+                    <!-- 
+                        Inside each folder (Leaf Bundle), Hugo can find associated resources.
+                        We look for the first image file to use as a thumbnail.
+                        It will match files with extensions like .jpg, .jpeg, .png, .gif
+                    -->
+                    {{ $image := .Resources.GetMatch "**.jpg" }}
+                    {{ if not $image }}{{ $image = .Resources.GetMatch "**.jpeg" }}{{ end }}
+                    {{ if not $image }}{{ $image = .Resources.GetMatch "**.png" }}{{ end }}
+                    {{ if not $image }}{{ $image = .Resources.GetMatch "**.gif" }}{{ end }}
+
+                    {{ if $image }}
+                        <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
+                    {{ else }}
+                        <!-- Fallback if no image is found -->
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">No Image</span>
+                        </div>
+                    {{ end }}
+                    <div class="p-4">
+                        <h2 class="font-bold text-lg truncate">{{ .Title }}</h2>
+                    </div>
+                </a>
+            </div>
+            {{ end }}
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}. All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
