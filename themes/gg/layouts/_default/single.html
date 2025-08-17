@@ -48,8 +48,8 @@
             <!-- Gallery of all images in the folder -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 {{- range .Resources.ByType "image" }}
-                <a href="{{ .RelPermalink }}">
-                    <img src="{{ (.Resize "600x").RelPermalink }}" loading="lazy" class="rounded-lg shadow-md w-full h-full object-cover" alt="{{ $name }}">
+                <a href="{{ .RelPermalink }}" class="block rounded-lg shadow-md overflow-hidden transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    <img src="{{ (.Resize "600x").RelPermalink }}" loading="lazy" class="w-full h-full object-cover" alt="{{ $name }}">
                 </a>
                 {{- end }}
             </div>
@@ -57,40 +57,61 @@
             <!-- Camera information / EXIF Data -->
             {{ if $featured1 }}
                 {{ with $featured1.Exif }}
-                <div class="camera-info border-t pt-6">
-                    <h2 class="text-2xl font-bold mb-4">Details</h2>
-                    <ul class="list-disc list-inside space-y-1">
-                        {{ with .Date }}<li>Date: {{ .Format "January 02, 2006 at 03:04 PM" }}</li>{{ end }}
-                        {{ with index .Tags "Model" }}<li>Camera Model: {{ . }}</li>{{ end }}
-                        {{ with index .Tags "LensModel" }}<li>Lens Model: {{ . }}</li>{{ end }}
-                        {{ with index .Tags "FNumber" }}<li>F Number: f/{{ . }}</li>{{ end }}
-                        <!-- **FIX**: Added a check to prevent division errors on ExposureTime -->
-                        {{ with index .Tags "ExposureTime" }}
-                            <li>Exposure Time: 
-                            {{ if gt . 0 }}
-                                1/{{ printf "%.0f" (div 1 . ) }}s
-                            {{ else }}
-                                {{ . }}s
-                            {{ end }}
-                            </li>
+                <div class="camera-info border-t pt-8">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Details</h2>
+                    <!-- **NEW**: Card-based grid layout for EXIF data -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        {{ with .Date }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <div><strong class="block text-gray-600">Date</strong> {{ .Format "January 02, 2006" }}</div>
+                        </div>
                         {{ end }}
-                        {{ with index .Tags "ISOSpeedRatings" }}<li>ISO Speed Ratings: {{ . }}</li>{{ end }}
-                        {{ with index .Tags "FocalLength" }}<li>Focal Length: {{ . }}mm</li>{{ end }}
-                    </ul>
+                        {{ with index .Tags "Model" }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <div><strong class="block text-gray-600">Camera Model</strong> {{ . }}</div>
+                        </div>
+                        {{ end }}
+                        {{ with index .Tags "LensModel" }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            <div><strong class="block text-gray-600">Lens Model</strong> {{ . }}</div>
+                        </div>
+                        {{ end }}
+                        {{ with index .Tags "FNumber" }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div><strong class="block text-gray-600">F Number</strong> f/{{ . }}</div>
+                        </div>
+                        {{ end }}
+                        {{ with index .Tags "ExposureTime" }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div><strong class="block text-gray-600">Exposure Time</strong> {{ if gt . 0 }}1/{{ printf "%.0f" (div 1 . ) }}s{{ else }}{{ . }}s{{ end }}</div>
+                        </div>
+                        {{ end }}
+                        {{ with index .Tags "ISOSpeedRatings" }}
+                        <div class="bg-gray-100 p-4 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4" /></svg>
+                            <div><strong class="block text-gray-600">ISO</strong> {{ . }}</div>
+                        </div>
+                        {{ end }}
+                    </div>
                 </div>
                 {{ end }}
             {{ end }}
 
             <!-- Tags Section -->
-            <div class="mt-8 pt-6 border-t">
-                This image is tagged with:
+            <div class="mt-8 pt-8 border-t">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Tagged With</h3>
                 {{ range (.GetTerms "tags") }}
-                    <a href="{{ .Permalink }}" class="text-blue-600 hover:underline ml-1">{{ .LinkTitle }}</a>{{ if ne .Next nil}},{{end}}
+                    <a href="{{ .Permalink }}" class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 mb-2 px-2.5 py-0.5 rounded-full hover:bg-blue-200">{{ .LinkTitle }}</a>
                 {{ end }}
             </div>
         </article>
 
-        <footer class="text-center mt-12 text-gray-500">
+        <footer class="text-center mt-16 text-gray-500">
             <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
         </footer>
     </div>
