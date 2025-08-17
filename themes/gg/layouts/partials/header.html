@@ -1,5 +1,28 @@
 <!-- layouts/partials/header.html -->
-<header class="bg-white shadow-md">
+<header class="bg-white shadow-md sticky top-0 z-50">
+    <!-- Add a style block for the CSS-only menu toggle -->
+    <style>
+        /* Hide the checkbox input */
+        #menu-toggle {
+            display: none;
+        }
+        /* Show the mobile menu when the checkbox is checked */
+        #menu-toggle:checked ~ #mobile-menu {
+            max-height: 500px; /* Animate the height */
+            border-top-width: 1px;
+        }
+        /* Change the hamburger icon to a close icon when checked */
+        #menu-toggle:checked ~ .container .hamburger-icon {
+            display: none;
+        }
+        #menu-toggle:checked ~ .container .close-icon {
+            display: block;
+        }
+    </style>
+
+    <!-- The invisible checkbox that will control the menu's state -->
+    <input type="checkbox" id="menu-toggle" class="hidden">
+
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Site Title and Description -->
         <div class="text-left">
@@ -8,34 +31,43 @@
         </div>
 
         <!-- Desktop Menu -->
-        <nav class="hidden md:flex space-x-6 items-center">
-            <a href="{{ .Site.BaseURL }}" class="text-gray-600 hover:text-blue-600 font-medium">Home</a>
-            <a href="/tags/" class="text-gray-600 hover:text-blue-600 font-medium">Tags</a>
-            <a href="/albums/" class="text-gray-600 hover:text-blue-600 font-medium">Albums</a>
+        <nav class="hidden md:flex space-x-8 items-center">
+            <a href="{{ .Site.BaseURL }}" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                Home
+            </a>
+            <a href="/tags/" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8v-3a2 2 0 012-2z" /></svg>
+                Tags
+            </a>
+            <a href="/albums/" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                Albums
+            </a>
         </nav>
 
-        <!-- Mobile Menu Button -->
+        <!-- Mobile Menu Button (now a label for the checkbox) -->
         <div class="md:hidden">
-            <button id="mobile-menu-button" class="text-gray-600 hover:text-blue-600 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                </svg>
-            </button>
+            <label for="menu-toggle" class="cursor-pointer text-gray-600 hover:text-blue-600">
+                <svg class="w-6 h-6 hamburger-icon block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                <svg class="w-6 h-6 close-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </label>
         </div>
     </div>
 
-    <!-- Mobile Menu (hidden by default) -->
-    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
-        <a href="{{ .Site.BaseURL }}" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-100">Home</a>
-        <a href="/tags/" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-100">Tags</a>
-        <a href="/albums/" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-100">Albums</a>
+    <!-- Mobile Menu (its visibility is now controlled by the checkbox) -->
+    <div id="mobile-menu" class="md:hidden max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-white">
+        <a href="{{ .Site.BaseURL }}" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            Home
+        </a>
+        <a href="/tags/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8v-3a2 2 0 012-2z" /></svg>
+            Tags
+        </a>
+        <a href="/albums/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+            Albums
+        </a>
     </div>
 </header>
-
-<script>
-    // JavaScript to toggle the mobile menu
-    document.getElementById('mobile-menu-button').addEventListener('click', function() {
-        var menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
-</script>
