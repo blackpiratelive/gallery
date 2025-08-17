@@ -1,73 +1,77 @@
 <!-- layouts/_default/single.html -->
 <!-- This file is for displaying a single gallery item with EXIF data. -->
+{{/* Get the first image to use for title and EXIF data */}}
+{{ $featured_image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+
+{{/* Process the filename to create a clean title */}}
+{{ $name := "" }}
+{{ if $featured_image }}
+    {{ $name = $featured_image.Name }}
+    {{ $name = replace $name "-" " " }}
+    {{ $name = replace $name "_" " " }}
+    {{ $name = path.BaseName $name }}
+    {{ $name = strings.TrimSuffix (path.Ext $name) $name }}
+    {{ $name = title $name }}
+{{ else }}
+    {{ $name = .Title }}
+{{ end }}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }} | {{ .Site.Title }}</title>
+    <title>{{ $name }} | {{ .Site.Title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="container mx-auto px-4 py-8">
-        <nav class="mb-8">
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="mb-8">
             <a href="{{ .Site.BaseURL }}" class="text-blue-600 hover:underline">&larr; Back to Gallery</a>
-        </nav>
+        </header>
 
-        <article class="max-w-5xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
-            {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+        <article>
+            <h1 class="text-4xl font-bold mb-4">{{ $name }}</h1>
+            
+            <div class="prose max-w-none mb-8">
+                {{ .Content }}
+            </div>
 
-            {{ if $image }}
-                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-auto">
-            {{ else }}
-                 <div class="w-full bg-gray-200 flex items-center justify-center p-8">
-                    <span class="text-gray-500">No Image Found For This Entry</span>
+            <!-- Gallery of all images in the folder -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                {{- range .Resources.ByType "image" }}
+                <a href="{{ .RelPermalink }}">
+                    <img src="{{ (.Resize "600x").RelPermalink }}" loading="lazy" class="rounded-lg shadow-md w-full h-full object-cover" alt="{{ $name }}">
+                </a>
+                {{- end }}
+            </div>
+
+            <!-- Camera information / EXIF Data -->
+            {{ if $featured_image }}
+                {{ with $featured_image.Exif }}
+                <div class="camera-info border-t pt-6">
+                    <h2 class="text-2xl font-bold mb-4">Details</h2>
+                    <ul class="list-disc list-inside space-y-1">
+                        {{ with .Date }}<li>Date: {{ .Format "January 02, 2006 at 03:04 PM" }}</li>{{ end }}
+                        {{ with index .Tags "Model" }}<li>Camera: {{ . }}</li>{{ end }}
+                        {{ with index .Tags "LensModel" }}<li>Lens: {{ . }}</li>{{ end }}
+                        {{ with index .Tags "FNumber" }}<li>Aperture: f/{{ . }}</li>{{ end }}
+                        {{ with index .Tags "ExposureTime" }}<li>Exposure Time: 1/{{ printf "%.0f" (div 1 . ) }}s</li>{{ end }}
+                        {{ with index .Tags "ISOSpeedRatings" }}<li>ISO: {{ . }}</li>{{ end }}
+                        {{ with index .Tags "FocalLength" }}<li>Focal Length: {{ . }}mm</li>{{ end }}
+                    </ul>
                 </div>
+                {{ end }}
             {{ end }}
 
-            <div class="p-8 md:p-10">
-                <div class="md:flex justify-between items-start mb-6">
-                    <div>
-                        <h1 class="text-4xl font-bold">{{ .Title }}</h1>
-                        <p class="text-lg text-gray-500 mt-1">{{ .Date.Format "January 2, 2006" }}</p>
-                    </div>
-                    {{ if $image }}
-                    <a href="{{ $image.RelPermalink }}" download
-                       class="mt-4 md:mt-0 inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                        Download
-                    </a>
-                    {{ end }}
-                </div>
-
-                <div class="prose max-w-none mb-8">
-                    {{ .Content }}
-                </div>
-
-                <!-- **FIXED**: EXIF Data Section using safer access method -->
-                {{ if $image }}
-                    <!-- **FIX**: Changed .Exif to $image.Exif to reference the image resource directly -->
-                    {{ with $image.Exif }}
-                    <div class="border-t pt-6">
-                        <h2 class="text-2xl font-bold mb-4">Image Details</h2>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
-                            <!-- Use the top-level .Date, .Lat, .Long fields -->
-                            {{ with .Date }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Date Taken</strong> {{ .Format "Jan 2, 2006 15:04" }}</div>{{ end }}
-                            {{ if and .Lat .Long }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">GPS</strong> {{ printf "%.4f, %.4f" .Lat .Long }}</div>{{ end }}
-
-                            <!-- Safely access .Tags map using the 'index' function -->
-                            {{ with index .Tags "Make" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Make</strong> {{ . }}</div>{{ end }}
-                            {{ with index .Tags "Model" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Model</strong> {{ . }}</div>{{ end }}
-                            {{ with index .Tags "LensModel" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Lens</strong> {{ . }}</div>{{ end }}
-                            {{ with index .Tags "FNumber" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Aperture</strong> f/{{ . }}</div>{{ end }}
-                            {{ with index .Tags "ExposureTime" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Shutter</strong> 1/{{ printf "%.0f" (div 1 . ) }}s</div>{{ end }}
-                            {{ with index .Tags "ISOSpeedRatings" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">ISO</strong> {{ . }}</div>{{ end }}
-                            {{ with index .Tags "FocalLength" }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Focal Length</strong> {{ . }}mm</div>{{ end }}
-                        </div>
-                    </div>
-                    {{ end }}
+            <!-- Tags Section -->
+            <div class="mt-8 pt-6 border-t">
+                This image is tagged with:
+                {{ range (.GetTerms "tags") }}
+                    <a href="{{ .Permalink }}" class="text-blue-600 hover:underline ml-1">{{ .LinkTitle }}</a>{{ if ne .Next nil}},{{end}}
                 {{ end }}
             </div>
         </article>
