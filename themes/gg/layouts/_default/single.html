@@ -64,7 +64,16 @@
                         {{ with index .Tags "Model" }}<li>Camera Model: {{ . }}</li>{{ end }}
                         {{ with index .Tags "LensModel" }}<li>Lens Model: {{ . }}</li>{{ end }}
                         {{ with index .Tags "FNumber" }}<li>F Number: f/{{ . }}</li>{{ end }}
-                        {{ with index .Tags "ExposureTime" }}<li>Exposure Time: 1/{{ printf "%.0f" (div 1 . ) }}s</li>{{ end }}
+                        <!-- **FIX**: Added a check to prevent division errors on ExposureTime -->
+                        {{ with index .Tags "ExposureTime" }}
+                            <li>Exposure Time: 
+                            {{ if gt . 0 }}
+                                1/{{ printf "%.0f" (div 1 . ) }}s
+                            {{ else }}
+                                {{ . }}s
+                            {{ end }}
+                            </li>
+                        {{ end }}
                         {{ with index .Tags "ISOSpeedRatings" }}<li>ISO Speed Ratings: {{ . }}</li>{{ end }}
                         {{ with index .Tags "FocalLength" }}<li>Focal Length: {{ . }}mm</li>{{ end }}
                     </ul>
