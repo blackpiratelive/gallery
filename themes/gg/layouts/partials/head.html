@@ -19,8 +19,8 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 
-    <!-- Justified Gallery CSS (if needed on the page) -->
-    {{ if eq .Layout "list" }}
+    <!-- **FIX**: Load Justified Gallery CSS only on the homepage -->
+    {{ if .IsHome }}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/css/justifiedGallery.min.css" />
     {{ end }}
 </head>
