@@ -50,17 +50,18 @@
 
                 <!-- **NEW**: EXIF Data Section -->
                 {{ if $image }}
-                    {{ with $image.Exif }}
+                    {{ with .Exif }}
                     <div class="border-t pt-6">
                         <h2 class="text-2xl font-bold mb-4">Camera Details</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
-                            {{ with .Make }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Make</strong> {{ . }}</div>{{ end }}
-                            {{ with .Model }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Model</strong> {{ . }}</div>{{ end }}
-                            {{ with .LensModel }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Lens</strong> {{ . }}</div>{{ end }}
-                            {{ with .FNumber }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Aperture</strong> f/{{ . }}</div>{{ end }}
-                            {{ with .ExposureTime }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Shutter</strong> 1/{{ printf "%.0f" (div 1 . ) }}s</div>{{ end }}
-                            {{ with .ISOSpeedRatings }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">ISO</strong> {{ . }}</div>{{ end }}
-                            {{ with .FocalLength }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Focal Length</strong> {{ . }}mm</div>{{ end }}
+                            <!-- **FIX**: Correctly access EXIF fields via the .Tags map -->
+                            {{ with .Tags.Make }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Make</strong> {{ . }}</div>{{ end }}
+                            {{ with .Tags.Model }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Model</strong> {{ . }}</div>{{ end }}
+                            {{ with .Tags.LensModel }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Lens</strong> {{ . }}</div>{{ end }}
+                            {{ with .Tags.FNumber }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Aperture</strong> f/{{ . }}</div>{{ end }}
+                            {{ with .Tags.ExposureTime }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Shutter</strong> 1/{{ printf "%.0f" (div 1 . ) }}s</div>{{ end }}
+                            {{ with .Tags.ISOSpeedRatings }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">ISO</strong> {{ . }}</div>{{ end }}
+                            {{ with .Tags.FocalLength }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Focal Length</strong> {{ . }}mm</div>{{ end }}
                         </div>
                     </div>
                     {{ end }}
