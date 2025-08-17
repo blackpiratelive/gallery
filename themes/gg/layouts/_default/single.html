@@ -1,5 +1,5 @@
 <!-- layouts/_default/single.html -->
-<!-- This file is for displaying a single gallery item. -->
+<!-- This file is for displaying a single gallery item with EXIF data. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,11 +17,10 @@
             <a href="{{ .Site.BaseURL }}" class="text-blue-600 hover:underline">&larr; Back to Gallery</a>
         </nav>
 
-        <article class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+        <article class="max-w-5xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
             {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
 
             {{ if $image }}
-                <!-- Use .RelPermalink here as well for consistency and reliability -->
                 <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-auto">
             {{ else }}
                  <div class="w-full bg-gray-200 flex items-center justify-center p-8">
@@ -29,12 +28,43 @@
                 </div>
             {{ end }}
 
-            <div class="p-8">
-                <h1 class="text-4xl font-bold mb-4">{{ .Title }}</h1>
-                <div class="prose max-w-none">
-                    <!-- This will render the content from your index.md file -->
+            <div class="p-8 md:p-10">
+                <div class="md:flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-4xl font-bold">{{ .Title }}</h1>
+                        <!-- **NEW**: Display the date from front matter -->
+                        <p class="text-lg text-gray-500 mt-1">{{ .Date.Format "January 2, 2006" }}</p>
+                    </div>
+                    <!-- **NEW**: Download Button -->
+                    {{ if $image }}
+                    <a href="{{ $image.RelPermalink }}" download
+                       class="mt-4 md:mt-0 inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Download
+                    </a>
+                    {{ end }}
+                </div>
+
+                <div class="prose max-w-none mb-8">
                     {{ .Content }}
                 </div>
+
+                <!-- **NEW**: EXIF Data Section -->
+                {{ if $image }}
+                    {{ with $image.Exif }}
+                    <div class="border-t pt-6">
+                        <h2 class="text-2xl font-bold mb-4">Camera Details</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
+                            {{ with .Make }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Make</strong> {{ . }}</div>{{ end }}
+                            {{ with .Model }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Model</strong> {{ . }}</div>{{ end }}
+                            {{ with .LensModel }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Lens</strong> {{ . }}</div>{{ end }}
+                            {{ with .FNumber }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Aperture</strong> f/{{ . }}</div>{{ end }}
+                            {{ with .ExposureTime }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Shutter</strong> 1/{{ printf "%.0f" (div 1 . ) }}s</div>{{ end }}
+                            {{ with .ISOSpeedRatings }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">ISO</strong> {{ . }}</div>{{ end }}
+                            {{ with .FocalLength }}<div class="bg-gray-100 p-3 rounded-lg"><strong class="block text-gray-500">Focal Length</strong> {{ . }}mm</div>{{ end }}
+                        </div>
+                    </div>
+                    {{ end }}
+                {{ end }}
             </div>
         </article>
 
