@@ -2,19 +2,18 @@
 {{/* Get the first image to use for title, colors, and EXIF data */}}
 {{ $featured_image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
 
-{{/* --- COLOR LOGIC --- */}}
-{{/* Define fallback colors */}}
-{{ $accentColor := "#2563eb" }}  {{/* blue-600 */}}
-{{ $buttonTextColor := "text-white" }}
+{{/* --- BACKGROUND & COLOR LOGIC --- */}}
+{{ $bgImage := "" }}
+{{ $accentColor := "#2563eb" }} {{/* blue-600 fallback */}}
 
-{{/* If an image exists, extract its colors */}}
 {{ if $featured_image }}
+    {{/* Create a tiny, low-quality WebP for the blurred background */}}
+    {{ $bgImage = ($featured_image.Resize "50x webp q20").RelPermalink }}
+    
+    {{/* Extract accent color from the image */}}
     {{ $colors := $featured_image.Colors }}
-    {{/* Set the first accent color, if available */}}
     {{ if ge (len $colors) 1 }}
         {{ $accentColor = index $colors 0 }}
-        {{/* NOTE: The isColorDark function is removed to ensure build compatibility */}}
-        {{/* A simple semi-transparent overlay will be used on the button to ensure text is readable */}}
     {{ end }}
 {{ end }}
 
@@ -27,17 +26,35 @@
 <!DOCTYPE html>
 <html lang="en">
 {{- partial "head.html" . -}}
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-800">
+    <!-- **NEW**: Blurred Background Effect -->
+    {{ if $bgImage }}
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background-image: url('{{ $bgImage }}');
+            background-size: cover;
+            background-position: center;
+            filter: blur(25px) brightness(0.7);
+            z-index: -1;
+        }
+    </style>
+    {{ end }}
+
     {{- partial "header.html" . -}}
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <article class="bg-white rounded-lg shadow-xl overflow-hidden">
+    
+    <!-- The main content is now wrapped in a div to provide padding against the full-screen background -->
+    <div class="container mx-auto px-4 py-8 md:py-16">
+        <article class="bg-white rounded-lg shadow-2xl overflow-hidden">
             {{ if $featured_image }}
-                <div class="mb-8">
+                <div>
                      <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="w-full h-auto">
                 </div>
             {{ end }}
 
-            <div class="p-8">
+            <div class="p-6 md:p-10">
                 <div class="md:flex justify-between items-center mb-8">
                     <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $name }}</h1>
                     {{ if $featured_image }}
