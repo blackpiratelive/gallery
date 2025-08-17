@@ -19,16 +19,16 @@
 
         <article class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
             <!-- 
-                Similar to the list page, we find the main image to display.
-                You can have multiple images in a folder, but this will display the first one it finds.
+                **FIXED**: Use the same robust pattern here to find the main image.
             -->
-            {{ $image := .Resources.GetMatch "**.jpg" }}
-            {{ if not $image }}{{ $image = .Resources.GetMatch "**.jpeg" }}{{ end }}
-            {{ if not $image }}{{ $image = .Resources.GetMatch "**.png" }}{{ end }}
-            {{ if not $image }}{{ $image = .Resources.GetMatch "**.gif" }}{{ end }}
+            {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
 
             {{ if $image }}
                 <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-auto">
+            {{ else }}
+                 <div class="w-full bg-gray-200 flex items-center justify-center p-8">
+                    <span class="text-gray-500">No Image Found For This Entry</span>
+                </div>
             {{ end }}
 
             <div class="p-8">
