@@ -1,9 +1,13 @@
 baseURL = 'https://gallery.blackpiratex.com/'
 languageCode = 'en-us'
 title = 'Gallery By BlackPirateX'
-theme = 'justified'
+theme = 'gg'
 
 [imaging]
     anchor = 'Smart'
     quality = 25
     resampleFilter = 'Box'
+
+[taxonomies]
+  album = "albums"
+  tag = "tags" # You can keep this if you still want to use tags elsewhere

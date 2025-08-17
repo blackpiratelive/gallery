@@ -1,0 +1,130 @@
+<!-- layouts/_default/single.html -->
+{{/* Get the first image to use for title, colors, and EXIF data */}}
+{{ $featured_image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+
+{{/* --- BACKGROUND & COLOR LOGIC --- */}}
+{{ $bgImage := "" }}
+{{ $accentColor := "#2563eb" }} {{/* blue-600 fallback */}}
+
+{{ if $featured_image }}
+    {{/* Create a tiny, low-quality WebP for the blurred background */}}
+    {{ $bgImage = ($featured_image.Resize "50x webp q20").RelPermalink }}
+    
+    {{/* Extract accent color from the image */}}
+    {{ $colors := $featured_image.Colors }}
+    {{ if ge (len $colors) 1 }}
+        {{ $accentColor = index $colors 0 }}
+    {{ end }}
+{{ end }}
+
+{{/* Process the filename to create a clean title */}}
+{{ $name := .Title }}
+{{ if $featured_image }}
+    {{ $name = $featured_image.Name | replaceRE `[-_]` " " | strings.TrimSuffix (path.Ext .) | title }}
+{{ end }}
+
+<!DOCTYPE html>
+<html lang="en">
+{{- partial "head.html" . -}}
+<body class="bg-gray-800">
+    <!-- **NEW**: Blurred Background Effect -->
+    {{ if $bgImage }}
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background-image: url('{{ $bgImage }}');
+            background-size: cover;
+            background-position: center;
+            filter: blur(25px) brightness(0.7);
+            z-index: -1;
+        }
+    </style>
+    {{ end }}
+
+    {{- partial "header.html" . -}}
+    
+    <!-- The main content is now wrapped in a div to provide padding against the full-screen background -->
+    <div class="container mx-auto px-4 py-8 md:py-16">
+        <article class="bg-white rounded-lg shadow-2xl overflow-hidden">
+            {{ if $featured_image }}
+                <div>
+                     <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="w-full h-auto">
+                </div>
+            {{ end }}
+
+            <div class="p-6 md:p-10">
+                <div class="md:flex justify-between items-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $name }}</h1>
+                    {{ if $featured_image }}
+                    <a href="{{ $featured_image.RelPermalink }}" download
+                       class="mt-4 md:mt-0 relative inline-block text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+                        <!-- Background color layer -->
+                        <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                        <!-- Semi-transparent overlay to ensure contrast -->
+                        <span class="absolute inset-0 bg-black opacity-20"></span>
+                        <!-- Text layer -->
+                        <span class="relative z-10">Download Image</span>
+                    </a>
+                    {{ end }}
+                </div>
+                
+                <div class="prose max-w-none mb-12">
+                    {{ .Content }}
+                </div>
+
+                <!-- Camera information / EXIF Data -->
+                {{ if $featured_image }}
+                    {{ with $featured_image.Exif }}
+                    <div class="camera-info border-t pt-8">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            {{ with .Date }}
+                            <div class="p-4 rounded-lg flex items-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <div><strong class="block text-gray-600">Date</strong> {{ .Format "January 02, 2006" }}</div>
+                            </div>
+                            {{ end }}
+                            {{ with index .Tags "Model" }}
+                            <div class="p-4 rounded-lg flex items-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <div><strong class="block text-gray-600">Camera Model</strong> {{ . }}</div>
+                            </div>
+                            {{ end }}
+                        </div>
+                    </div>
+                    {{ end }}
+                {{ end }}
+
+                <!-- Albums Section -->
+                <div class="mt-8 pt-8 border-t">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Part of Albums</h3>
+                    {{ range (.GetTerms "albums") }}
+                        <a href="{{ .Permalink }}" class="inline-block text-white text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80 relative overflow-hidden">
+                           <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                           <span class="absolute inset-0 bg-black opacity-20"></span>
+                           <span class="relative z-10">{{ .LinkTitle }}</span>
+                        </a>
+                    {{ end }}
+                </div>
+
+                <!-- Tags Section -->
+                <div class="mt-8 pt-8 border-t">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Tags</h3>
+                    {{ range (.GetTerms "tags") }}
+                         <a href="{{ .Permalink }}" class="inline-block text-white text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80 relative overflow-hidden">
+                           <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                           <span class="absolute inset-0 bg-black opacity-20"></span>
+                           <span class="relative z-10">{{ .LinkTitle }}</span>
+                        </a>
+                    {{ end }}
+                </div>
+            </div>
+        </article>
+    </div>
+    <footer class="text-center py-8 bg-gray-100 text-gray-500">
+        <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
+    </footer>
+</body>
+</html>

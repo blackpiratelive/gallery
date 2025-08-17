@@ -1,0 +1,32 @@
+<!-- layouts/albums/list.html -->
+<!DOCTYPE html>
+<html lang="en">
+{{- partial "head.html" . -}}
+<body class="bg-gray-100 text-gray-800">
+    {{- partial "header.html" . -}}
+    <div class="container mx-auto px-4 py-8">
+        <main class="space-y-12">
+            {{ range .Site.Taxonomies.albums.ByCount }}
+            <section>
+                <h2 class="text-3xl font-bold mb-4 text-left">{{ .Page.Title }}</h2>
+                <div class="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
+                    {{ range .Pages }}
+                        {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+                        {{ if $image }}
+                            {{ $thumb := $image.Fill "400x225" }}
+                            <a href="{{ .RelPermalink }}" class="block flex-shrink-0 w-64 rounded-lg shadow-md overflow-hidden transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                                <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-full object-cover">
+                            </a>
+                        {{ end }}
+                    {{ end }}
+                </div>
+            </section>
+            {{ end }}
+        </main>
+
+        <footer class="text-center mt-16 text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
+        </footer>
+    </div>
+</body>
+</html>
