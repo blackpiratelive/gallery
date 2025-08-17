@@ -19,26 +19,24 @@
         </header>
 
         <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- 
-                We loop through all the pages in the content directory.
-                The structure you have is a good example of Page Bundles in Hugo.
-                Each numbered folder is a "Leaf Bundle".
-            -->
             {{ range .Pages }}
             <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out">
                 <a href="{{ .Permalink }}">
-                    <!-- 
-                        Inside each folder (Leaf Bundle), Hugo can find associated resources.
-                        We look for the first image file to use as a thumbnail.
-                        It will match files with extensions like .jpg, .jpeg, .png, .gif
-                    -->
+                    <!-- Find the first image resource in the folder -->
                     {{ $image := .Resources.GetMatch "**.jpg" }}
                     {{ if not $image }}{{ $image = .Resources.GetMatch "**.jpeg" }}{{ end }}
                     {{ if not $image }}{{ $image = .Resources.GetMatch "**.png" }}{{ end }}
                     {{ if not $image }}{{ $image = .Resources.GetMatch "**.gif" }}{{ end }}
 
                     {{ if $image }}
-                        <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
+                        <!-- 
+                            ** Image Processing **
+                            1. Resize the image to 400px width (height is automatic).
+                            2. Convert the format to WebP.
+                            3. Set the quality to 60 (on a scale of 1-100). This is fairly compressed.
+                        -->
+                        {{ $thumb := $image.Resize "400x webp q60" }}
+                        <img src="{{ $thumb.Permalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
                     {{ else }}
                         <!-- Fallback if no image is found -->
                         <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
@@ -55,6 +53,55 @@
 
         <footer class="text-center mt-12 text-gray-500">
             <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}. All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
+
+<!-- layouts/_default/single.html -->
+<!-- This file is for displaying a single gallery item. (No changes here) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }} | {{ .Site.Title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <nav class="mb-8">
+            <a href="{{ .Site.BaseURL }}" class="text-blue-600 hover:underline">&larr; Back to Gallery</a>
+        </nav>
+
+        <article class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+            <!-- 
+                Similar to the list page, we find the main image to display.
+                You can have multiple images in a folder, but this will display the first one it finds.
+            -->
+            {{ $image := .Resources.GetMatch "**.jpg" }}
+            {{ if not $image }}{{ $image = .Resources.GetMatch "**.jpeg" }}{{ end }}
+            {{ if not $image }}{{ $image = .Resources.GetMatch "**.png" }}{{ end }}
+            {{ if not $image }}{{ $image = .Resources.GetMatch "**.gif" }}{{ end }}
+
+            {{ if $image }}
+                <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-auto">
+            {{ end }}
+
+            <div class="p-8">
+                <h1 class="text-4xl font-bold mb-4">{{ .Title }}</h1>
+                <div class="prose max-w-none">
+                    <!-- This will render the content from your index.md file -->
+                    {{ .Content }}
+                </div>
+            </div>
+        </article>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
         </footer>
     </div>
 </body>
