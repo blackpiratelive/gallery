@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Site.Title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -18,7 +18,8 @@
             <p class="text-xl text-gray-600">{{ .Site.Params.description }}</p>
         </header>
 
-        <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- **CHANGE**: Updated grid for larger images (fewer columns) -->
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {{ range .Pages }}
             <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out">
                 <a href="{{ .Permalink }}">
@@ -29,14 +30,14 @@
 
                     {{ if $image }}
                         <!-- 
-                            **RE-APPLIED IMAGE PROCESSING**:
-                            Now we process the found image and use .RelPermalink on the result.
+                            **CHANGE**: Increased image processing size for better quality on the larger grid.
                         -->
-                        {{ $thumb := $image.Resize "400x webp q60" }}
-                        <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
+                        {{ $thumb := $image.Resize "600x webp q75" }}
+                        <!-- **CHANGE**: Increased image container height -->
+                        <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-72 object-cover">
                     {{ else }}
                         <!-- Fallback if no image is found -->
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                        <div class="w-full h-72 bg-gray-200 flex items-center justify-center">
                             <span class="text-gray-500">No Image Found</span>
                         </div>
                     {{ end }}
