@@ -15,8 +15,8 @@
     {{/* Set the dominant color as the background, if available */}}
     {{ if ge (len $colors) 1 }}
         {{ $bgColor = index $colors 0 }}
-        {{/* Check if the background is dark to set a contrasting text color */}}
-        {{ if (hugo.IsColorDark $bgColor) }}
+        {{/* **FIX**: Use the correct 'isColorDark' function */}}
+        {{ if (isColorDark $bgColor) }}
             {{ $textColor = "text-gray-100" }}
         {{ else }}
             {{ $textColor = "text-gray-800" }}
@@ -25,8 +25,8 @@
     {{/* Set the first accent color, if available */}}
     {{ if ge (len $colors) 2 }}
         {{ $accentColor = index $colors 1 }}
-        {{/* Check if the accent color is dark for button text contrast */}}
-         {{ if (hugo.IsColorDark $accentColor) }}
+        {{/* **FIX**: Use the correct 'isColorDark' function */}}
+         {{ if (isColorDark $accentColor) }}
             {{ $buttonTextColor = "text-gray-100" }}
         {{ else }}
             {{ $buttonTextColor = "text-gray-900" }}
@@ -66,7 +66,7 @@
                     {{ end }}
                 </div>
                 
-                <div class="prose max-w-none mb-12 {{ if (hugo.IsColorDark $bgColor) }}prose-invert{{ end }}">
+                <div class="prose max-w-none mb-12 {{ if (isColorDark $bgColor) }}prose-invert{{ end }}">
                     {{ .Content }}
                 </div>
 
