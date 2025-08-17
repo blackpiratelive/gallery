@@ -18,25 +18,17 @@
             <p class="text-xl text-gray-600">{{ .Site.Params.description }}</p>
         </header>
 
-        <!-- **CHANGE**: Updated grid for larger images (fewer columns) -->
         <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {{ range .Pages }}
             <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out">
-                <a href="{{ .Permalink }}">
-                    <!-- 
-                        Use a robust pattern to find the first image of any common type.
-                    -->
+                <!-- **CHANGE**: Switched to .RelPermalink for relative linking -->
+                <a href="{{ .RelPermalink }}">
                     {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
 
                     {{ if $image }}
-                        <!-- 
-                            **CHANGE**: Increased image processing size for better quality on the larger grid.
-                        -->
                         {{ $thumb := $image.Resize "600x webp q75" }}
-                        <!-- **CHANGE**: Increased image container height -->
                         <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-72 object-cover">
                     {{ else }}
-                        <!-- Fallback if no image is found -->
                         <div class="w-full h-72 bg-gray-200 flex items-center justify-center">
                             <span class="text-gray-500">No Image Found</span>
                         </div>
