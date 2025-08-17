@@ -1,0 +1,62 @@
+<!-- layouts/albums/list.html -->
+<!-- This template lists all your albums in a Netflix-style UI -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albums | {{ .Site.Title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom utility to hide scrollbars for a cleaner look */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8 text-center">
+             <h1 class="text-4xl font-bold">All Albums</h1>
+        </header>
+
+        <main class="space-y-12">
+            <!-- Loop through each term in the "albums" taxonomy -->
+            {{ range .Site.Taxonomies.albums.ByCount }}
+            <section>
+                <!-- Album Title -->
+                <h2 class="text-3xl font-bold mb-4 text-left">{{ .Page.Title }}</h2>
+                
+                <!-- Horizontally scrollable container for images -->
+                <div class="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
+                    <!-- Loop through each page (image post) in the current album -->
+                    {{ range .Pages }}
+                        {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+                        {{ if $image }}
+                            <!-- 
+                                Process the image:
+                                1. Fill ensures the image is exactly 400x225px, cropping as needed.
+                                   This creates the uniform, cinematic 16:9 look.
+                            -->
+                            {{ $thumb := $image.Fill "400x225" }}
+                            <a href="{{ .RelPermalink }}" class="block flex-shrink-0 w-64 rounded-lg shadow-md overflow-hidden transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                                <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-full object-cover">
+                            </a>
+                        {{ end }}
+                    {{ end }}
+                </div>
+            </section>
+            {{ end }}
+        </main>
+
+        <footer class="text-center mt-16 text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
+        </footer>
+    </div>
+</body>
+</html>
