@@ -4,33 +4,17 @@
 
 {{/* --- COLOR LOGIC --- */}}
 {{/* Define fallback colors */}}
-{{ $bgColor := "#ffffff" }}      {{/* white */}}
 {{ $accentColor := "#2563eb" }}  {{/* blue-600 */}}
-{{ $textColor := "text-gray-800" }}
 {{ $buttonTextColor := "text-white" }}
 
 {{/* If an image exists, extract its colors */}}
 {{ if $featured_image }}
     {{ $colors := $featured_image.Colors }}
-    {{/* Set the dominant color as the background, if available */}}
-    {{ if ge (len $colors) 1 }}
-        {{ $bgColor = index $colors 0 }}
-        {{/* **FIX**: Use the correct 'isColorDark' function */}}
-        {{ if (isColorDark $bgColor) }}
-            {{ $textColor = "text-gray-100" }}
-        {{ else }}
-            {{ $textColor = "text-gray-800" }}
-        {{ end }}
-    {{ end }}
     {{/* Set the first accent color, if available */}}
-    {{ if ge (len $colors) 2 }}
-        {{ $accentColor = index $colors 1 }}
-        {{/* **FIX**: Use the correct 'isColorDark' function */}}
-         {{ if (isColorDark $accentColor) }}
-            {{ $buttonTextColor = "text-gray-100" }}
-        {{ else }}
-            {{ $buttonTextColor = "text-gray-900" }}
-        {{ end }}
+    {{ if ge (len $colors) 1 }}
+        {{ $accentColor = index $colors 0 }}
+        {{/* NOTE: The isColorDark function is removed to ensure build compatibility */}}
+        {{/* A simple semi-transparent overlay will be used on the button to ensure text is readable */}}
     {{ end }}
 {{ end }}
 
@@ -43,49 +27,52 @@
 <!DOCTYPE html>
 <html lang="en">
 {{- partial "head.html" . -}}
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800">
     {{- partial "header.html" . -}}
-    <!-- The main content area's background will be the dominant color -->
-    <div class="transition-colors duration-500" style="background-color: {{ $bgColor | safeCSS }};">
-        <div class="container mx-auto px-4 py-8 max-w-5xl">
-            <article class="{{ $textColor }}">
-                {{ if $featured_image }}
-                    <div class="mb-8">
-                         <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="rounded-lg shadow-xl w-full h-auto">
-                    </div>
-                {{ end }}
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <article class="bg-white rounded-lg shadow-xl overflow-hidden">
+            {{ if $featured_image }}
+                <div class="mb-8">
+                     <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="w-full h-auto">
+                </div>
+            {{ end }}
 
+            <div class="p-8">
                 <div class="md:flex justify-between items-center mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold">{{ $name }}</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $name }}</h1>
                     {{ if $featured_image }}
                     <a href="{{ $featured_image.RelPermalink }}" download
-                       class="mt-4 md:mt-0 inline-block {{ $buttonTextColor }} font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                       style="background-color: {{ $accentColor | safeCSS }};">
-                        Download Image
+                       class="mt-4 md:mt-0 relative inline-block text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+                        <!-- Background color layer -->
+                        <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                        <!-- Semi-transparent overlay to ensure contrast -->
+                        <span class="absolute inset-0 bg-black opacity-20"></span>
+                        <!-- Text layer -->
+                        <span class="relative z-10">Download Image</span>
                     </a>
                     {{ end }}
                 </div>
                 
-                <div class="prose max-w-none mb-12 {{ if (isColorDark $bgColor) }}prose-invert{{ end }}">
+                <div class="prose max-w-none mb-12">
                     {{ .Content }}
                 </div>
 
                 <!-- Camera information / EXIF Data -->
                 {{ if $featured_image }}
                     {{ with $featured_image.Exif }}
-                    <div class="camera-info border-t pt-8" style="border-color: {{ $accentColor | safeCSS }};">
-                        <h2 class="text-sm font-bold uppercase tracking-wider mb-4">Details</h2>
+                    <div class="camera-info border-t pt-8">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Details</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             {{ with .Date }}
-                            <div class="p-4 rounded-lg flex items-center bg-black bg-opacity-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                <div><strong class="block opacity-80">Date</strong> {{ .Format "January 02, 2006" }}</div>
+                            <div class="p-4 rounded-lg flex items-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <div><strong class="block text-gray-600">Date</strong> {{ .Format "January 02, 2006" }}</div>
                             </div>
                             {{ end }}
                             {{ with index .Tags "Model" }}
-                            <div class="p-4 rounded-lg flex items-center bg-black bg-opacity-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <div><strong class="block opacity-80">Camera Model</strong> {{ . }}</div>
+                            <div class="p-4 rounded-lg flex items-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <div><strong class="block text-gray-600">Camera Model</strong> {{ . }}</div>
                             </div>
                             {{ end }}
                         </div>
@@ -94,22 +81,30 @@
                 {{ end }}
 
                 <!-- Albums Section -->
-                <div class="mt-8 pt-8 border-t" style="border-color: {{ $accentColor | safeCSS }};">
-                    <h3 class="text-sm font-bold uppercase tracking-wider mb-2">Part of Albums</h3>
+                <div class="mt-8 pt-8 border-t">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Part of Albums</h3>
                     {{ range (.GetTerms "albums") }}
-                        <a href="{{ .Permalink }}" class="inline-block {{ $buttonTextColor }} text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80" style="background-color: {{ $accentColor | safeCSS }};">{{ .LinkTitle }}</a>
+                        <a href="{{ .Permalink }}" class="inline-block text-white text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80 relative overflow-hidden">
+                           <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                           <span class="absolute inset-0 bg-black opacity-20"></span>
+                           <span class="relative z-10">{{ .LinkTitle }}</span>
+                        </a>
                     {{ end }}
                 </div>
 
                 <!-- Tags Section -->
-                <div class="mt-8 pt-8 border-t" style="border-color: {{ $accentColor | safeCSS }};">
-                    <h3 class="text-sm font-bold uppercase tracking-wider mb-2">Tags</h3>
+                <div class="mt-8 pt-8 border-t">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Tags</h3>
                     {{ range (.GetTerms "tags") }}
-                         <a href="{{ .Permalink }}" class="inline-block {{ $buttonTextColor }} text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80" style="background-color: {{ $accentColor | safeCSS }};">{{ .LinkTitle }}</a>
+                         <a href="{{ .Permalink }}" class="inline-block text-white text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80 relative overflow-hidden">
+                           <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                           <span class="absolute inset-0 bg-black opacity-20"></span>
+                           <span class="relative z-10">{{ .LinkTitle }}</span>
+                        </a>
                     {{ end }}
                 </div>
-            </article>
-        </div>
+            </div>
+        </article>
     </div>
     <footer class="text-center py-8 bg-gray-100 text-gray-500">
         <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
