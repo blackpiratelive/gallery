@@ -1,40 +1,15 @@
 <!-- layouts/_default/list.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Site.Title }}</title>
-    <!-- Tailwind is used for header/footer and basic page styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Justified Gallery CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/css/justifiedGallery.min.css" />
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Style for the gallery items */
-        #mygallery .jg-entry {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        #mygallery .jg-entry:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            z-index: 10;
-        }
-    </style>
-</head>
+{{- partial "head.html" . -}}
 <body class="bg-gray-100 text-gray-800">
+    {{- partial "header.html" . -}}
     <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold">{{ .Site.Title }}</h1>
-            <p class="text-xl text-gray-600">{{ .Site.Params.description }}</p>
-        </header>
-
-        <!-- **CHANGE**: This is the container for the Justified Gallery -->
+        <!-- The main content is now just the gallery itself -->
         <main id="mygallery">
             {{ range .Pages }}
                 {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
                 {{ if $image }}
-                    {{/* Resize image to a max width for performance, height is auto to keep ratio */}}
                     {{ $processed := $image.Resize "800x" }}
                     <a href="{{ .RelPermalink }}">
                         <img src="{{ $processed.RelPermalink }}" alt="{{ .Title }}" />
@@ -52,12 +27,11 @@
     <script src="https://code.jquery.com/jquery-latest.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
     <script>
-        // Initialize the gallery
         $(document).ready(function () {
             $("#mygallery").justifiedGallery({
-                rowHeight: 240, // The preferred height of rows
-                lastRow: 'justify', // How to handle the last row
-                margins: 8 // The space between images
+                rowHeight: 240,
+                lastRow: 'justify',
+                margins: 8
             });
         });
     </script>
