@@ -1,14 +1,25 @@
 <!-- layouts/_default/list.html -->
-<!-- This file is for the main gallery page that shows all your items. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Site.Title }}</title>
+    <!-- Tailwind is used for header/footer and basic page styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Justified Gallery CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/css/justifiedGallery.min.css" />
     <style>
         body { font-family: 'Inter', sans-serif; }
+        /* Style for the gallery items */
+        #mygallery .jg-entry {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #mygallery .jg-entry:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -18,26 +29,17 @@
             <p class="text-xl text-gray-600">{{ .Site.Params.description }}</p>
         </header>
 
-        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- **CHANGE**: This is the container for the Justified Gallery -->
+        <main id="mygallery">
             {{ range .Pages }}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out">
-                <!-- **CHANGE**: Switched to .RelPermalink for relative linking -->
-                <a href="{{ .RelPermalink }}">
-                    {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
-
-                    {{ if $image }}
-                        {{ $thumb := $image.Resize "600x webp q75" }}
-                        <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-72 object-cover">
-                    {{ else }}
-                        <div class="w-full h-72 bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-500">No Image Found</span>
-                        </div>
-                    {{ end }}
-                    <div class="p-4">
-                        <h2 class="font-bold text-lg truncate">{{ .Title }}</h2>
-                    </div>
-                </a>
-            </div>
+                {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+                {{ if $image }}
+                    {{/* Resize image to a max width for performance, height is auto to keep ratio */}}
+                    {{ $processed := $image.Resize "800x" }}
+                    <a href="{{ .RelPermalink }}">
+                        <img src="{{ $processed.RelPermalink }}" alt="{{ .Title }}" />
+                    </a>
+                {{ end }}
             {{ end }}
         </main>
 
@@ -45,5 +47,19 @@
             <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}. All Rights Reserved.</p>
         </footer>
     </div>
+
+    <!-- jQuery and Justified Gallery JS -->
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+    <script>
+        // Initialize the gallery
+        $(document).ready(function () {
+            $("#mygallery").justifiedGallery({
+                rowHeight: 240, // The preferred height of rows
+                lastRow: 'justify', // How to handle the last row
+                margins: 8 // The space between images
+            });
+        });
+    </script>
 </body>
 </html>
