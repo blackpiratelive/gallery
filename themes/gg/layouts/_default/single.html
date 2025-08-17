@@ -18,13 +18,11 @@
         </nav>
 
         <article class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
-            <!-- 
-                **FIXED**: Use the same robust pattern here to find the main image.
-            -->
             {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
 
             {{ if $image }}
-                <img src="{{ $image.Permalink }}" alt="{{ .Title }}" class="w-full h-auto">
+                <!-- Use .RelPermalink here as well for consistency and reliability -->
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-auto">
             {{ else }}
                  <div class="w-full bg-gray-200 flex items-center justify-center p-8">
                     <span class="text-gray-500">No Image Found For This Entry</span>
