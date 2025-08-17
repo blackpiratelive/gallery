@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>{{ .Site.Title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -29,11 +29,11 @@
 
                     {{ if $image }}
                         <!-- 
-                            **FIX**: Switched from .Permalink to .RelPermalink.
-                            This generates a site-relative URL for the image, which is
-                            often more reliable than the absolute .Permalink.
+                            **RE-APPLIED IMAGE PROCESSING**:
+                            Now we process the found image and use .RelPermalink on the result.
                         -->
-                        <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
+                        {{ $thumb := $image.Resize "400x webp q60" }}
+                        <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" class="w-full h-48 object-cover">
                     {{ else }}
                         <!-- Fallback if no image is found -->
                         <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
