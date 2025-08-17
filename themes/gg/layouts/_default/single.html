@@ -1,77 +1,118 @@
 <!-- layouts/_default/single.html -->
+{{/* Get the first image to use for title, colors, and EXIF data */}}
 {{ $featured_image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
-{{ $name := "" }}
+
+{{/* --- COLOR LOGIC --- */}}
+{{/* Define fallback colors */}}
+{{ $bgColor := "#ffffff" }}      {{/* white */}}
+{{ $accentColor := "#2563eb" }}  {{/* blue-600 */}}
+{{ $textColor := "text-gray-800" }}
+{{ $buttonTextColor := "text-white" }}
+
+{{/* If an image exists, extract its colors */}}
 {{ if $featured_image }}
-    {{ $name = $featured_image.Name }}
-    {{ $name = replace $name "-" " " }}
-    {{ $name = replace $name "_" " " }}
-    {{ $name = path.BaseName $name }}
-    {{ $name = strings.TrimSuffix (path.Ext $name) $name }}
-    {{ $name = title $name }}
-{{ else }}
-    {{ $name = .Title }}
+    {{ $colors := $featured_image.Colors }}
+    {{/* Set the dominant color as the background, if available */}}
+    {{ if ge (len $colors) 1 }}
+        {{ $bgColor = index $colors 0 }}
+        {{/* Check if the background is dark to set a contrasting text color */}}
+        {{ if (hugo.IsColorDark $bgColor) }}
+            {{ $textColor = "text-gray-100" }}
+        {{ else }}
+            {{ $textColor = "text-gray-800" }}
+        {{ end }}
+    {{ end }}
+    {{/* Set the first accent color, if available */}}
+    {{ if ge (len $colors) 2 }}
+        {{ $accentColor = index $colors 1 }}
+        {{/* Check if the accent color is dark for button text contrast */}}
+         {{ if (hugo.IsColorDark $accentColor) }}
+            {{ $buttonTextColor = "text-gray-100" }}
+        {{ else }}
+            {{ $buttonTextColor = "text-gray-900" }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{/* Process the filename to create a clean title */}}
+{{ $name := .Title }}
+{{ if $featured_image }}
+    {{ $name = $featured_image.Name | replaceRE `[-_]` " " | strings.TrimSuffix (path.Ext .) | title }}
 {{ end }}
 
 <!DOCTYPE html>
 <html lang="en">
 {{- partial "head.html" . -}}
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100">
     {{- partial "header.html" . -}}
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <article>
-            {{ if $featured_image }}
-                <div class="mb-8">
-                     <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="rounded-lg shadow-xl w-full h-auto">
-                </div>
-            {{ end }}
-
-            <div class="md:flex justify-between items-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold">{{ $name }}</h1>
+    <!-- The main content area's background will be the dominant color -->
+    <div class="transition-colors duration-500" style="background-color: {{ $bgColor | safeCSS }};">
+        <div class="container mx-auto px-4 py-8 max-w-5xl">
+            <article class="{{ $textColor }}">
                 {{ if $featured_image }}
-                <a href="{{ $featured_image.RelPermalink }}" download
-                   class="mt-4 md:mt-0 inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg">
-                    Download Image
-                </a>
-                {{ end }}
-            </div>
-            
-            <div class="prose max-w-none mb-12">
-                {{ .Content }}
-            </div>
-
-            {{ if $featured_image }}
-                {{ with $featured_image.Exif }}
-                <div class="camera-info border-t pt-8">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Details</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        {{ with .Date }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            <div><strong class="block text-gray-600">Date</strong> {{ .Format "January 02, 2006" }}</div>
-                        </div>
-                        {{ end }}
-                        {{ with index .Tags "Model" }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <div><strong class="block text-gray-600">Camera Model</strong> {{ . }}</div>
-                        </div>
-                        {{ end }}
+                    <div class="mb-8">
+                         <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="rounded-lg shadow-xl w-full h-auto">
                     </div>
+                {{ end }}
+
+                <div class="md:flex justify-between items-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold">{{ $name }}</h1>
+                    {{ if $featured_image }}
+                    <a href="{{ $featured_image.RelPermalink }}" download
+                       class="mt-4 md:mt-0 inline-block {{ $buttonTextColor }} font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                       style="background-color: {{ $accentColor | safeCSS }};">
+                        Download Image
+                    </a>
+                    {{ end }}
                 </div>
-                {{ end }}
-            {{ end }}
+                
+                <div class="prose max-w-none mb-12 {{ if (hugo.IsColorDark $bgColor) }}prose-invert{{ end }}">
+                    {{ .Content }}
+                </div>
 
-            <div class="mt-8 pt-8 border-t">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Part of Albums</h3>
-                {{ range (.GetTerms "albums") }}
-                    <a href="{{ .Permalink }}" class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 mb-2 px-2.5 py-0.5 rounded-full hover:bg-blue-200">{{ .LinkTitle }}</a>
+                <!-- Camera information / EXIF Data -->
+                {{ if $featured_image }}
+                    {{ with $featured_image.Exif }}
+                    <div class="camera-info border-t pt-8" style="border-color: {{ $accentColor | safeCSS }};">
+                        <h2 class="text-sm font-bold uppercase tracking-wider mb-4">Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            {{ with .Date }}
+                            <div class="p-4 rounded-lg flex items-center bg-black bg-opacity-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <div><strong class="block opacity-80">Date</strong> {{ .Format "January 02, 2006" }}</div>
+                            </div>
+                            {{ end }}
+                            {{ with index .Tags "Model" }}
+                            <div class="p-4 rounded-lg flex items-center bg-black bg-opacity-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <div><strong class="block opacity-80">Camera Model</strong> {{ . }}</div>
+                            </div>
+                            {{ end }}
+                        </div>
+                    </div>
+                    {{ end }}
                 {{ end }}
-            </div>
-        </article>
 
-        <footer class="text-center mt-16 text-gray-500">
-            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
-        </footer>
+                <!-- Albums Section -->
+                <div class="mt-8 pt-8 border-t" style="border-color: {{ $accentColor | safeCSS }};">
+                    <h3 class="text-sm font-bold uppercase tracking-wider mb-2">Part of Albums</h3>
+                    {{ range (.GetTerms "albums") }}
+                        <a href="{{ .Permalink }}" class="inline-block {{ $buttonTextColor }} text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80" style="background-color: {{ $accentColor | safeCSS }};">{{ .LinkTitle }}</a>
+                    {{ end }}
+                </div>
+
+                <!-- Tags Section -->
+                <div class="mt-8 pt-8 border-t" style="border-color: {{ $accentColor | safeCSS }};">
+                    <h3 class="text-sm font-bold uppercase tracking-wider mb-2">Tags</h3>
+                    {{ range (.GetTerms "tags") }}
+                         <a href="{{ .Permalink }}" class="inline-block {{ $buttonTextColor }} text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full hover:opacity-80" style="background-color: {{ $accentColor | safeCSS }};">{{ .LinkTitle }}</a>
+                    {{ end }}
+                </div>
+            </article>
+        </div>
     </div>
+    <footer class="text-center py-8 bg-gray-100 text-gray-500">
+        <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
+    </footer>
 </body>
 </html>
