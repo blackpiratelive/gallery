@@ -1,8 +1,5 @@
 <!-- layouts/_default/single.html -->
-{{/* Get the first image to use for title and EXIF data */}}
 {{ $featured_image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
-
-{{/* Process the filename to create a clean title from the featured image */}}
 {{ $name := "" }}
 {{ if $featured_image }}
     {{ $name = $featured_image.Name }}
@@ -12,32 +9,16 @@
     {{ $name = strings.TrimSuffix (path.Ext $name) $name }}
     {{ $name = title $name }}
 {{ else }}
-    {{/* Fallback to the page's content file title if no image is found */}}
     {{ $name = .Title }}
 {{ end }}
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $name }} | {{ .Site.Title }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .prose h1, .prose h2, .prose h3 { margin-bottom: 1rem; }
-        .prose p { margin-bottom: 1rem; line-height: 1.6; }
-        .prose a { color: #007bff; }
-    </style>
-</head>
+{{- partial "head.html" . -}}
 <body class="bg-gray-100 text-gray-800">
+    {{- partial "header.html" . -}}
     <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <header class="mb-8">
-            <a href="{{ .Site.BaseURL }}" class="text-blue-600 hover:underline">&larr; Back to Gallery</a>
-        </header>
-
         <article>
-            <!-- **CHANGE**: Display only one, large, original-quality image -->
             {{ if $featured_image }}
                 <div class="mb-8">
                      <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="rounded-lg shadow-xl w-full h-auto">
@@ -46,7 +27,6 @@
 
             <div class="md:flex justify-between items-center mb-8">
                 <h1 class="text-3xl md:text-4xl font-bold">{{ $name }}</h1>
-                 <!-- **CHANGE**: Added a large download button -->
                 {{ if $featured_image }}
                 <a href="{{ $featured_image.RelPermalink }}" download
                    class="mt-4 md:mt-0 inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg">
@@ -59,7 +39,6 @@
                 {{ .Content }}
             </div>
 
-            <!-- Camera information / EXIF Data -->
             {{ if $featured_image }}
                 {{ with $featured_image.Exif }}
                 <div class="camera-info border-t pt-8">
@@ -77,36 +56,11 @@
                             <div><strong class="block text-gray-600">Camera Model</strong> {{ . }}</div>
                         </div>
                         {{ end }}
-                        {{ with index .Tags "LensModel" }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            <div><strong class="block text-gray-600">Lens Model</strong> {{ . }}</div>
-                        </div>
-                        {{ end }}
-                        {{ with index .Tags "FNumber" }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <div><strong class="block text-gray-600">F Number</strong> f/{{ . }}</div>
-                        </div>
-                        {{ end }}
-                        {{ with index .Tags "ExposureTime" }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <div><strong class="block text-gray-600">Exposure Time</strong> {{ if gt . 0 }}1/{{ printf "%.0f" (div 1 . ) }}s{{ else }}{{ . }}s{{ end }}</div>
-                        </div>
-                        {{ end }}
-                        {{ with index .Tags "ISOSpeedRatings" }}
-                        <div class="bg-white p-4 rounded-lg flex items-center shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4" /></svg>
-                            <div><strong class="block text-gray-600">ISO</strong> {{ . }}</div>
-                        </div>
-                        {{ end }}
                     </div>
                 </div>
                 {{ end }}
             {{ end }}
 
-            <!-- **CHANGE**: Albums Section -->
             <div class="mt-8 pt-8 border-t">
                 <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Part of Albums</h3>
                 {{ range (.GetTerms "albums") }}
