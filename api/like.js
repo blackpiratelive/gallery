@@ -6,14 +6,34 @@ const client = createClient({
 });
 
 export default async function handler(req, res) {
-  const { photoId } = JSON.parse(req.body);
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-  await client.execute(
-    "INSERT INTO likes (photo_id, count) VALUES (?, 1) ON CONFLICT(photo_id) DO UPDATE SET count = count + 1",
-    [photoId]
-  );
+  try {
+    // Ensure body is parsed correctly
+    let body = req.body;
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
+    const { photoId } = body;
 
-  const result = await client.execute("SELECT count FROM likes WHERE photo_id = ?", [photoId]);
+    // Insert or update likes
+    await client.execute(
+      "INSERT INTO likes (photo_id, count) VALUES (?, 1) " +
+      "ON CONFLICT(photo_id) DO UPDATE SET count = count + 1",
+      [photoId]
+    );
 
-  res.status(200).json({ likes: result.rows[0].count });
+    // Fetch updated count
+    const result = await client.execute(
+      "SELECT count FROM likes WHERE photo_id = ?",
+      [photoId]
+    );
+
+    res.status(200).json({ likes: result.rows[0].count });
+  } catch (err) {
+    console.error("Function error:", err);
+    res.status(500).json({ error: err.message });
+  }
 }
