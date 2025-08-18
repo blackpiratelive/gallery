@@ -1,0 +1,46 @@
+<!-- layouts/albums/term.html -->
+<!-- This template displays all images for a SINGLE album, like the homepage -->
+<!DOCTYPE html>
+<html lang="en">
+{{- partial "head.html" . -}}
+<body class="bg-gray-100 text-gray-800">
+    {{- partial "header.html" . -}}
+    <div class="container mx-auto px-4 py-8">
+        <!-- Title for the specific album page -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold">Tag: {{ .Title }}</h1>
+        </header>
+
+        <!-- The main content is the Justified Gallery -->
+        <main id="mygallery">
+            <!-- This loop correctly ranges over the pages within this specific album -->
+            {{ range .Pages }}
+                {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+                {{ if $image }}
+                    {{ $processed := $image.Resize "800x" }}
+                    <a href="{{ .RelPermalink }}">
+                        <img src="{{ $processed.RelPermalink }}" alt="{{ .Title }}" />
+                    </a>
+                {{ end }}
+            {{ end }}
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
+        </footer>
+    </div>
+
+    <!-- **FIX**: Added jQuery and Justified Gallery JS to initialize the gallery -->
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#mygallery").justifiedGallery({
+                rowHeight: 240,
+                lastRow: 'justify',
+                margins: 8
+            });
+        });
+    </script>
+</body>
+</html>
