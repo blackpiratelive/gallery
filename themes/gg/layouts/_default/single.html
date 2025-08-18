@@ -5,11 +5,21 @@
 {{/* --- BACKGROUND & COLOR LOGIC --- */}}
 {{ $bgImage := "" }}
 {{ $accentColor := "#2563eb" }} {{/* blue-600 fallback */}}
+{{ $placeholder := "" }}
+{{ $width := 0 }}
+{{ $height := 0 }}
 
 {{ if $featured_image }}
+    {{/* Get original dimensions to prevent layout shift */}}
+    {{ $width = $featured_image.Width }}
+    {{ $height = $featured_image.Height }}
+
     {{/* Create a tiny, low-quality WebP for the blurred background */}}
     {{ $bgImage = ($featured_image.Resize "50x webp q20").RelPermalink }}
     
+    {{/* Create a tiny placeholder for the main image loading effect */}}
+    {{ $placeholder = ($featured_image.Resize "100x webp q10").RelPermalink }}
+
     {{/* Extract accent color from the image */}}
     {{ $colors := $featured_image.Colors }}
     {{ if ge (len $colors) 1 }}
@@ -27,7 +37,7 @@
 <html lang="en">
 {{- partial "head.html" . -}}
 <body class="bg-gray-800">
-    <!-- **NEW**: Blurred Background Effect -->
+    <!-- Blurred Background Effect -->
     {{ if $bgImage }}
     <style>
         body::before {
@@ -45,12 +55,21 @@
 
     {{- partial "header.html" . -}}
     
-    <!-- The main content is now wrapped in a div to provide padding against the full-screen background -->
     <div class="container mx-auto px-4 py-8 md:py-16">
         <article class="bg-white rounded-lg shadow-2xl overflow-hidden">
             {{ if $featured_image }}
-                <div>
-                     <img src="{{ $featured_image.RelPermalink }}" alt="{{ $name }}" class="w-full h-auto">
+                <!-- **NEW**: Image container that prevents layout shift -->
+                <div class="relative bg-gray-200" style="padding-bottom: {{ mul (div (float $height) (float $width)) 100 }}%;">
+                    <!-- Low-quality, blurred placeholder image -->
+                    <img src="{{ $placeholder }}" aria-hidden="true" class="absolute top-0 left-0 w-full h-full object-cover filter blur-md">
+                    <!-- High-quality final image -->
+                    <img src="{{ $featured_image.RelPermalink }}"
+                         alt="{{ $name }}"
+                         class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 opacity-0"
+                         width="{{ $width }}"
+                         height="{{ $height }}"
+                         loading="lazy"
+                         onload="this.style.opacity = 1;">
                 </div>
             {{ end }}
 
@@ -60,11 +79,8 @@
                     {{ if $featured_image }}
                     <a href="{{ $featured_image.RelPermalink }}" download
                        class="mt-4 md:mt-0 relative inline-block text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
-                        <!-- Background color layer -->
                         <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
-                        <!-- Semi-transparent overlay to ensure contrast -->
                         <span class="absolute inset-0 bg-black opacity-20"></span>
-                        <!-- Text layer -->
                         <span class="relative z-10">Download Image</span>
                     </a>
                     {{ end }}
