@@ -3,11 +3,12 @@
 const { createClient } = require('@libsql/client');
 
 // Initialize the Turso DB client using environment variables
+const dbUrl = process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-  // **FIX**: Explicitly disable migration checks
-  syncUrl: undefined,
+  url: dbUrl.replace(/^https?:\/\//, "libsql://"), // ensure correct protocol
+  authToken,
 });
 
 module.exports = async (req, res) => {
@@ -17,7 +18,6 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
-
   // Handle preflight requests for CORS
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -25,7 +25,6 @@ module.exports = async (req, res) => {
 
   // Get the unique photo slug from the query parameter
   const { slug } = req.query;
-
   if (!slug) {
     return res.status(400).json({ error: 'Slug is required' });
   }
@@ -34,11 +33,11 @@ module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
       const rs = await db.execute({
-        sql: 'SELECT count FROM likes WHERE slug = ?',
+        sql: 'SELECT likes_count FROM likes WHERE slug = ?',
         args: [slug],
       });
 
-      const count = rs.rows.length > 0 ? rs.rows[0].count : 0;
+      const count = rs.rows.length > 0 ? rs.rows[0].likes_count : 0;
       return res.status(200).json({ count });
 
     } catch (e) {
@@ -50,19 +49,19 @@ module.exports = async (req, res) => {
   // --- HANDLE POST REQUEST (Increment Likes) ---
   if (req.method === 'POST') {
     try {
-      // Use INSERT ... ON CONFLICT to create the row or increment the count atomically
+      // Use INSERT ... ON CONFLICT to create the row or increment the likes_count atomically
       await db.execute({
-        sql: 'INSERT INTO likes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1',
+        sql: 'INSERT INTO likes (slug, likes_count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET likes_count = likes_count + 1',
         args: [slug],
       });
       
       // Fetch the new count to return it
       const rs = await db.execute({
-        sql: 'SELECT count FROM likes WHERE slug = ?',
+        sql: 'SELECT likes_count FROM likes WHERE slug = ?',
         args: [slug],
       });
 
-      const newCount = rs.rows[0].count;
+      const newCount = rs.rows[0].likes_count;
       return res.status(200).json({ count: newCount });
 
     } catch (e) {
