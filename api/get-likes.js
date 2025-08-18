@@ -23,6 +23,8 @@ module.exports = async (req, res) => {
     const db = createClient({
         url: dbUrl,
         authToken: authToken,
+        // **FIX**: Explicitly disable migration checks
+        syncUrl: undefined,
     });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
