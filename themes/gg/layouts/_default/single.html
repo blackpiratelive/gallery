@@ -50,6 +50,31 @@
             filter: blur(25px) brightness(0.7);
             z-index: -1;
         }
+        /* CSS for the like button */
+        #likeButton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            color: #374151; /* gray-700 */
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px solid #d1d5db; /* gray-300 */
+            transition: all 0.2s ease-in-out;
+        }
+        #likeButton:hover {
+            background-color: #e5e7eb; /* gray-200 */
+        }
+        #likeButton.liked {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            border-color: #ef4444;
+        }
+        #likeButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
     </style>
     {{ end }}
 
@@ -88,6 +113,16 @@
                 
                 <div class="prose max-w-none mb-12">
                     {{ .Content }}
+                </div>
+
+                <!-- **NEW**: Like Counter Section -->
+                <div class="flex items-center space-x-4 mb-8">
+                    <button id="likeButton">
+                        <!-- Content is set by JavaScript -->
+                    </button>
+                    <div class="text-lg font-medium text-gray-700">
+                        <span id="likeCount">...</span> Likes
+                    </div>
                 </div>
 
                 <!-- Camera information / EXIF Data -->
@@ -148,19 +183,6 @@
                         </a>
                     {{ end }}
                 </div>
-        <button onclick="likePhoto('{{ .Params.id }}')">❤️ Like</button>
-<span id="like-count-{{ .Params.id }}"></span>
-
-<script>
-async function likePhoto(photoId) {
-  const res = await fetch("/api/like", {
-    method: "POST",
-    body: JSON.stringify({ photoId }),
-  });
-  const data = await res.json();
-  document.getElementById("like-count-" + photoId).innerText = data.likes;
-}
-</script>
 
                 <!-- Tags Section -->
                 <div class="mt-8 pt-8 border-t">
@@ -176,6 +198,85 @@ async function likePhoto(photoId) {
             </div>
         </article>
     </div>
+    
     {{- partial "footer.html" . -}}
+
+    <!-- Like Counter Script -->
+    <script>
+        async function initLikeCounter(photoId) {
+            if (!photoId) {
+                console.error("Photo ID is missing.");
+                return;
+            }
+
+            const likeButton = document.getElementById('likeButton');
+            const likeCountSpan = document.getElementById('likeCount');
+            const apiUrl = `/api/like?slug=${photoId}`;
+            const likedPhotosKey = 'likedPhotos';
+
+            const updateButtonState = (hasLiked) => {
+                if (hasLiked) {
+                    likeButton.disabled = true;
+                    likeButton.classList.add('liked');
+                    likeButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                        </svg>
+                        Liked
+                    `;
+                } else {
+                    likeButton.disabled = false;
+                    likeButton.classList.remove('liked');
+                    likeButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        Like
+                    `;
+                }
+            };
+
+            const getLikedPhotos = () => {
+                try { return JSON.parse(localStorage.getItem(likedPhotosKey)) || {}; } 
+                catch (e) { return {}; }
+            };
+
+            // Fetch initial likes
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                likeCountSpan.textContent = data.count;
+            } catch (e) {
+                console.error("Failed to fetch likes:", e);
+                likeCountSpan.textContent = 'N/A';
+            }
+
+            // Set initial button state
+            const likedPhotos = getLikedPhotos();
+            updateButtonState(likedPhotos[photoId]);
+
+            // Handle button click
+            likeButton.addEventListener('click', async () => {
+                likeButton.disabled = true;
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST' });
+                    const data = await response.json();
+                    likeCountSpan.textContent = data.count;
+
+                    const currentLikedPhotos = getLikedPhotos();
+                    currentLikedPhotos[photoId] = true;
+                    localStorage.setItem(likedPhotosKey, JSON.stringify(currentLikedPhotos));
+                    updateButtonState(true);
+                } catch (e) {
+                    console.error("Failed to update likes:", e);
+                    likeButton.disabled = false;
+                }
+            });
+        }
+
+        // Use the page's URL slug as the unique ID for the photo
+        const photoId = '{{ .File.ContentBaseName }}'; 
+        initLikeCounter(photoId);
+    </script>
 </body>
 </html>

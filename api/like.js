@@ -1,46 +1,72 @@
-import { createClient } from "@libsql/client";
+// api/like.js
+import { createClient } from '@libsql/client/edge';
+import { VercelRequest, VercelResponse } from '@vercel/node';
 
-const client = createClient({
-  url: process.env.TURSO_DB_URL,
-  authToken: process.env.TURSO_DB_TOKEN,
+// Initialize the Turso DB client using environment variables
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  // Allow requests from your site's origin
+  res.setHeader('Access-Control-Allow-Origin', '*'); // For production, replace '*' with your actual domain
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests for CORS
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  try {
-    // Parse body safely
-    let body = req.body;
-    if (typeof body === "string") {
-      body = JSON.parse(body);
-    }
+  // Get the unique photo slug from the query parameter
+  const { slug } = req.query;
 
-    const { photoId } = body;
-
-    if (!photoId) {
-      return res.status(400).json({ error: "Missing photoId" });
-    }
-
-    // Insert if new, otherwise increment
-    await client.execute(
-      "INSERT INTO likes (photo_id, count) VALUES (?, 1) " +
-      "ON CONFLICT(photo_id) DO UPDATE SET count = count + 1",
-      [photoId]
-    );
-
-    // Fetch updated count
-    const result = await client.execute(
-      "SELECT count FROM likes WHERE photo_id = ?",
-      [photoId]
-    );
-
-    const likes = result.rows[0]?.count ?? 0;
-
-    return res.status(200).json({ likes });
-  } catch (err) {
-    console.error("Like API error:", err);
-    return res.status(500).json({ error: err.message });
+  if (!slug) {
+    return res.status(400).json({ error: 'Slug is required' });
   }
+
+  // --- HANDLE GET REQUEST (Fetch Likes) ---
+  if (req.method === 'GET') {
+    try {
+      const rs = await db.execute({
+        sql: 'SELECT count FROM likes WHERE slug = ?',
+        args: [slug],
+      });
+
+      const count = rs.rows.length > 0 ? rs.rows[0].count : 0;
+      return res.status(200).json({ count });
+
+    } catch (e) {
+      console.error('Failed to fetch likes:', e);
+      return res.status(500).json({ error: 'Failed to fetch likes' });
+    }
+  }
+
+  // --- HANDLE POST REQUEST (Increment Likes) ---
+  if (req.method === 'POST') {
+    try {
+      // Use INSERT ... ON CONFLICT to create the row or increment the count atomically
+      await db.execute({
+        sql: 'INSERT INTO likes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1',
+        args: [slug],
+      });
+      
+      // Fetch the new count to return it
+      const rs = await db.execute({
+        sql: 'SELECT count FROM likes WHERE slug = ?',
+        args: [slug],
+      });
+
+      const newCount = rs.rows[0].count;
+      return res.status(200).json({ count: newCount });
+
+    } catch (e) {
+      console.error('Failed to update likes:', e);
+      return res.status(500).json({ error: 'Failed to update likes' });
+    }
+  }
+
+  // If not GET or POST, return method not allowed
+  return res.status(405).json({ error: 'Method not allowed' });
 }
