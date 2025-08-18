@@ -1,5 +1,5 @@
 // api/like.js
-import { createClient } from '@libsql/client/edge';
+import { createClient } from '@libsql/client'; // CORRECTED IMPORT
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Initialize the Turso DB client using environment variables
