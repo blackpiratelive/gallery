@@ -255,7 +255,6 @@
                 likeCountSpan.textContent = data.count;
             } catch (e) {
                 console.error("Failed to fetch likes:", e);
-                // **FIX**: Display "Error" on the page if fetching fails
                 likeCountSpan.textContent = 'Error';
             }
 
@@ -272,14 +271,17 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
+                    
+                    // **FIX**: Ensure UI updates after successful POST
                     likeCountSpan.textContent = data.count;
-
                     const currentLikedPhotos = getLikedPhotos();
                     currentLikedPhotos[photoId] = true;
                     localStorage.setItem(likedPhotosKey, JSON.stringify(currentLikedPhotos));
                     updateButtonState(true);
+
                 } catch (e) {
                     console.error("Failed to update likes:", e);
+                    // Re-enable button if the POST request fails
                     likeButton.disabled = false;
                 }
             });
