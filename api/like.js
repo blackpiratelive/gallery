@@ -1,4 +1,4 @@
-import { createClient } from "@libsql/client/web";
+import { createClient } from "@libsql/client";
 
 const client = createClient({
   url: process.env.TURSO_DB_URL,
@@ -11,14 +11,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Ensure body is parsed correctly
+    // Parse body safely
     let body = req.body;
     if (typeof body === "string") {
       body = JSON.parse(body);
     }
+
     const { photoId } = body;
 
-    // Insert or update likes
+    if (!photoId) {
+      return res.status(400).json({ error: "Missing photoId" });
+    }
+
+    // Insert if new, otherwise increment
     await client.execute(
       "INSERT INTO likes (photo_id, count) VALUES (?, 1) " +
       "ON CONFLICT(photo_id) DO UPDATE SET count = count + 1",
@@ -31,9 +36,11 @@ export default async function handler(req, res) {
       [photoId]
     );
 
-    res.status(200).json({ likes: result.rows[0].count });
+    const likes = result.rows[0]?.count ?? 0;
+
+    return res.status(200).json({ likes });
   } catch (err) {
-    console.error("Function error:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Like API error:", err);
+    return res.status(500).json({ error: err.message });
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "my-gallery",
+  "version": "1.0.0",
+  "description": "Static Hugo gallery site with likes",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@libsql/client": "^0.6.0"
+  }
+}
