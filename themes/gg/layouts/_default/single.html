@@ -101,28 +101,31 @@
             <div class="p-6 md:p-10">
                 <div class="md:flex justify-between items-center mb-8">
                     <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $name }}</h1>
-                    {{ if $featured_image }}
-                    <a href="{{ $featured_image.RelPermalink }}" download
-                       class="mt-4 md:mt-0 relative inline-block text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
-                        <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
-                        <span class="absolute inset-0 bg-black opacity-20"></span>
-                        <span class="relative z-10">Download Image</span>
-                    </a>
-                    {{ end }}
+                    <!-- **FIX**: Grouped buttons together in a flex container -->
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        {{ if $featured_image }}
+                        <a href="{{ $featured_image.RelPermalink }}" download
+                           class="relative inline-block text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+                            <span class="absolute inset-0" style="background-color: {{ $accentColor | safeCSS }};"></span>
+                            <span class="absolute inset-0 bg-black opacity-20"></span>
+                            <span class="relative z-10">Download Image</span>
+                        </a>
+                        {{ end }}
+                        <!-- Like Button and Counter -->
+                        <div class="flex items-center space-x-3">
+                            <button id="likeButton">
+                                <!-- Content is set by JavaScript -->
+                            </button>
+                            <div class="text-lg font-medium text-gray-700">
+                                <span id="likeCount">...</span>
+                                <span>Likes</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="prose max-w-none mb-12">
                     {{ .Content }}
-                </div>
-
-                <!-- **NEW**: Like Counter Section -->
-                <div class="flex items-center space-x-4 mb-8">
-                    <button id="likeButton">
-                        <!-- Content is set by JavaScript -->
-                    </button>
-                    <div class="text-lg font-medium text-gray-700">
-                        <span id="likeCount">...</span> Likes
-                    </div>
                 </div>
 
                 <!-- Camera information / EXIF Data -->
