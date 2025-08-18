@@ -1,77 +1,61 @@
 // api/like.js
-
 const { createClient } = require('@libsql/client');
 
-// Initialize the Turso DB client using environment variables
-const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+// --- DEBUGGING STEP ---
+// Log the environment variables to see what Vercel is actually using.
+const dbUrl = process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
+console.log("--- Like Function ---");
+console.log("TURSO_DATABASE_URL Loaded:", !!dbUrl);
+console.log("TURSO_AUTH_TOKEN Loaded:", !!authToken);
+if (dbUrl) {
+    console.log("URL starts with:", dbUrl.substring(0, 15));
+}
 
 module.exports = async (req, res) => {
-  // --- RESPONSE HEADERS ---
-  // Allow requests from your site's origin
-  res.setHeader('Access-Control-Allow-Origin', '*'); // For production, replace '*' with your actual domain
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  // Prevent Vercel from caching the API response
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-
-
-  // Handle preflight requests for CORS
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Get the unique photo slug from the query parameter
-  const { slug } = req.query;
-
-  if (!slug) {
-    return res.status(400).json({ error: 'Slug is required' });
-  }
-
-  // --- HANDLE GET REQUEST (Fetch Likes) ---
-  if (req.method === 'GET') {
-    try {
-      const rs = await db.execute({
-        sql: 'SELECT count FROM likes WHERE slug = ?',
-        args: [slug],
-      });
-
-      const count = rs.rows.length > 0 ? rs.rows[0].count : 0;
-      return res.status(200).json({ count });
-
-    } catch (e) {
-      console.error('Failed to fetch likes:', e);
-      return res.status(500).json({ error: 'Failed to fetch likes' });
+    // Check if variables are missing and return a clear error
+    if (!dbUrl || !authToken) {
+        console.error("Database credentials are not configured in Vercel environment variables.");
+        return res.status(500).json({ error: "Server configuration error." });
     }
-  }
 
-  // --- HANDLE POST REQUEST (Increment Likes) ---
-  if (req.method === 'POST') {
-    try {
-      // Use INSERT ... ON CONFLICT to create the row or increment the count atomically
-      await db.execute({
-        sql: 'INSERT INTO likes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1',
-        args: [slug],
-      });
-      
-      // Fetch the new count to return it
-      const rs = await db.execute({
-        sql: 'SELECT count FROM likes WHERE slug = ?',
-        args: [slug],
-      });
+    const db = createClient({
+        url: dbUrl,
+        authToken: authToken,
+    });
 
-      const newCount = rs.rows[0].count;
-      return res.status(200).json({ count: newCount });
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Cache-Control', 'no-cache');
 
-    } catch (e) {
-      console.error('Failed to update likes:', e);
-      return res.status(500).json({ error: 'Failed to update likes' });
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
-  }
 
-  // If not GET or POST, return method not allowed
-  // **FIX**: Corrected the status code from '4isColorDarko5' to '405'
-  return res.status(405).json({ error: 'Method not allowed' });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { slug } = req.query;
+    if (!slug) {
+        return res.status(400).json({ error: 'Slug is required' });
+    }
+
+    try {
+        await db.execute({
+            sql: 'INSERT INTO likes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1',
+            args: [slug],
+        });
+        const rs = await db.execute({
+            sql: 'SELECT count FROM likes WHERE slug = ?',
+            args: [slug],
+        });
+        const newCount = rs.rows[0].count;
+        return res.status(200).json({ count: newCount });
+    } catch (e) {
+        console.error('Failed to update likes:', e);
+        return res.status(500).json({ error: 'Failed to update likes' });
+    }
 };
