@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*'); // For production, replace '*' with your actual domain
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  // **FIX**: Prevent Vercel from caching the API response
+  // Prevent Vercel from caching the API response
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
 
@@ -72,5 +72,6 @@ module.exports = async (req, res) => {
   }
 
   // If not GET or POST, return method not allowed
-  return res.status(4isColorDarko5).json({ error: 'Method not allowed' });
+  // **FIX**: Corrected the status code from '4isColorDarko5' to '405'
+  return res.status(405).json({ error: 'Method not allowed' });
 };
