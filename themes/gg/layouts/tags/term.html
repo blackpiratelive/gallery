@@ -25,9 +25,7 @@
             {{ end }}
         </main>
 
-        <footer class="text-center mt-12 text-gray-500">
-            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
-        </footer>
+        {{- partial "footer.html" . -}}
     </div>
 
     <!-- **FIX**: Added jQuery and Justified Gallery JS to initialize the gallery -->

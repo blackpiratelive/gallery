@@ -32,18 +32,23 @@
 
         <!-- Desktop Menu -->
         <nav class="hidden md:flex space-x-8 items-center">
-            <a href="{{ .Site.BaseURL }}" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+            {{ $currentPage := . }}
+            <a href="{{ .Site.BaseURL }}" class="flex items-center font-medium {{ if $currentPage.IsHome }}text-blue-600 font-bold{{ else }}text-gray-600 hover:text-blue-600{{ end }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 Home
             </a>
-            <a href="/tags/" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+            <a href="/tags/" class="flex items-center font-medium {{ if and (eq .Type "tags") (eq .Kind "taxonomy") }}text-blue-600 font-bold{{ else }}text-gray-600 hover:text-blue-600{{ end }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8v-3a2 2 0 012-2z" /></svg>
                 Tags
             </a>
-            <a href="/albums/" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">
+            <a href="/albums/" class="flex items-center font-medium {{ if and (eq .Type "albums") (eq .Kind "taxonomy") }}text-blue-600 font-bold{{ else }}text-gray-600 hover:text-blue-600{{ end }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                 Albums
             </a>
+            <a href="https://blog.blackpiratex.com/" target="_blank" rel="noopener noreferrer" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">Blog</a>
+            <a href="https://blackpiratex.com/about" target="_blank" rel="noopener noreferrer" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">About</a>
+            <a href="https://blackpiratex.com/contact/" target="_blank" rel="noopener noreferrer" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">Contact</a>
+            <a href="https://status.blackpiratex.com/" target="_blank" rel="noopener noreferrer" class="flex items-center text-gray-600 hover:text-blue-600 font-medium">Status</a>
         </nav>
 
         <!-- Mobile Menu Button (now a label for the checkbox) -->
@@ -57,17 +62,12 @@
 
     <!-- Mobile Menu (its visibility is now controlled by the checkbox) -->
     <div id="mobile-menu" class="md:hidden max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-white">
-        <a href="{{ .Site.BaseURL }}" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-            Home
-        </a>
-        <a href="/tags/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8v-3a2 2 0 012-2z" /></svg>
-            Tags
-        </a>
-        <a href="/albums/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-            Albums
-        </a>
+        <a href="{{ .Site.BaseURL }}" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Home</a>
+        <a href="/tags/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Tags</a>
+        <a href="/albums/" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Albums</a>
+        <a href="https://blog.blackpiratex.com/" target="_blank" rel="noopener noreferrer" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Blog</a>
+        <a href="https://blackpiratex.com/about" target="_blank" rel="noopener noreferrer" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">About</a>
+        <a href="https://blackpiratex.com/contact/" target="_blank" rel="noopener noreferrer" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Contact</a>
+        <a href="https://status.blackpiratex.com/" target="_blank" rel="noopener noreferrer" class="flex items-center py-3 px-4 text-gray-600 hover:bg-gray-100">Status</a>
     </div>
 </header>

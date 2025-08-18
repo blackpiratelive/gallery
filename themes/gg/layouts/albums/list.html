@@ -24,9 +24,7 @@
             {{ end }}
         </main>
 
-        <footer class="text-center mt-16 text-gray-500">
-            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}.</p>
-        </footer>
+     {{- partial "footer.html" . -}}
     </div>
 </body>
 </html>

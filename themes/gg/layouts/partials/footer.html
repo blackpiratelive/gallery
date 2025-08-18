@@ -1,0 +1,23 @@
+<!-- layouts/partials/footer.html -->
+<footer class="bg-gray-100 text-gray-600 border-t">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-6">
+            <h3 class="text-lg font-semibold uppercase tracking-wider text-gray-500">Socials</h3>
+        </div>
+        
+        <!-- Social Links Grid -->
+        <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 max-w-2xl mx-auto mb-8">
+            <a href="https://links.blackpiratex.com/github" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">GitHub</a>
+            <a href="https://links.blackpiratex.com/pixelfed" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">Pixelfed</a>
+            <a href="https://links.blackpiratex.com/mastodon" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">Mastodon</a>
+            <a href="https://links.blackpiratex.com/yt" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">YouTube</a>
+            <a href="https://links.blackpiratex.com/wa" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">WhatsApp</a>
+            <a href="https://links.blackpiratex.com/signal" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">Signal</a>
+            <a href="https://links.blackpiratex.com/last.fm" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors">Last.fm</a>
+        </div>
+
+        <div class="text-center text-sm text-gray-500">
+            <p>&copy; {{ now.Format "2006" }} {{ .Site.Title }}. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
