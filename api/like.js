@@ -1,6 +1,7 @@
 // api/like.js
-import { createClient } from '@libsql/client'; // CORRECTED IMPORT
-import { VercelRequest, VercelResponse } from '@vercel/node';
+
+// **FIX**: Use CommonJS require() for better compatibility with Vercel's build environment.
+const { createClient } = require('@libsql/client');
 
 // Initialize the Turso DB client using environment variables
 const db = createClient({
@@ -8,7 +9,8 @@ const db = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-export default async function handler(req, res) {
+// **FIX**: Use module.exports for the handler function.
+module.exports = async (req, res) => {
   // Allow requests from your site's origin
   res.setHeader('Access-Control-Allow-Origin', '*'); // For production, replace '*' with your actual domain
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -69,4 +71,4 @@ export default async function handler(req, res) {
 
   // If not GET or POST, return method not allowed
   return res.status(405).json({ error: 'Method not allowed' });
-}
+};
