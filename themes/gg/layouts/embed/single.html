@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery Embed</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent;
+    }
+    
+    .embed-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .embed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .embed-image-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      aspect-ratio: 1;
+    }
+    
+    .embed-image-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .embed-image-card:hover img {
+      transform: scale(1.05);
+    }
+    
+    .view-all-btn {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 14px 28px;
+      background: #2563eb;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background 0.2s ease;
+    }
+    
+    .view-all-btn:hover {
+      background: #1d4ed8;
+    }
+    
+    @media (max-width: 640px) {
+      .embed-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      
+      .embed-container {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="embed-container">
+    <div class="embed-grid">
+      {{/* Get all pages with images, sorted by date (newest first) */}}
+      {{ $pages := where .Site.RegularPages "Section" "gallery" }}
+      {{ $count := 0 }}
+      
+      {{ range $pages }}
+        {{ if lt $count 5 }}
+          {{/* Get the featured image for this page */}}
+          {{ $image := .Resources.GetMatch "{*.jpg,*.jpeg,*.png,*.gif}" }}
+          
+          {{ if $image }}
+            {{/* Create heavily compressed WebP under 20kb */}}
+            {{ $compressed := $image.Resize "400x webp q30" }}
+            
+            <a href="{{ .Permalink }}" class="embed-image-card" target="_blank" rel="noopener">
+              <img 
+                src="{{ $compressed.RelPermalink }}" 
+                alt="{{ .Title }}"
+                loading="lazy"
+                width="{{ $compressed.Width }}"
+                height="{{ $compressed.Height }}"
+              >
+            </a>
+            
+            {{ $count = add $count 1 }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    </div>
+    
+    <a href="{{ .Site.BaseURL }}" class="view-all-btn" target="_blank" rel="noopener">
+      View all images
+    </a>
+  </div>
+</body>
+</html>
