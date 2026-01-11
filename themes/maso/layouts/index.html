@@ -1,0 +1,96 @@
+{{ define "main" }}
+
+{{/* --- SECTION 1: FEATURED IMAGES --- */}}
+{{/* Fetch pages where featured is true, sort by weight (1, 2, 3...) */}}
+{{ $featured := where .Site.RegularPages "Params.featured" true }}
+{{ $featured := $featured.ByWeight }}
+
+{{ if $featured }}
+<div class="section-header">
+    <h2>Featured</h2>
+</div>
+<div class="masonry-wrapper">
+    <div class="masonry-grid">
+        {{ range $featured }}
+            {{ $image := .Resources.GetMatch "*.jpg" }}
+            {{ if $image }}
+                {{ $thumb := $image.Resize "600x webp q50" }}
+                <a href="{{ .RelPermalink }}" class="grid-item featured-item">
+                    <img 
+                        src="{{ $thumb.RelPermalink }}" 
+                        width="{{ $thumb.Width }}" 
+                        height="{{ $thumb.Height }}" 
+                        alt="{{ .Title }}" 
+                        loading="lazy">
+                    
+                    <div class="grid-caption">
+                        <h3>{{ .Title }}</h3>
+                        <p>Featured</p>
+                    </div>
+                </a>
+            {{ end }}
+        {{ end }}
+    </div>
+</div>
+{{ end }}
+
+
+{{/* --- SECTION 2: ALL IMAGES (PAGINATED) --- */}}
+{{/* Fetch pages where featured is NOT true to avoid duplicates */}}
+{{ $regular := where .Site.RegularPages "Params.featured" "!=" true }}
+{{/* Sort by Date (newest first) */}}
+{{ $regular := $regular.ByDate.Reverse }}
+
+{{/* Configure Pagination: 25 items per page */}}
+{{ $paginator := .Paginate $regular 25 }}
+
+<div class="section-header">
+    <h2>Latest Gallery</h2>
+</div>
+
+<div class="masonry-wrapper">
+    <div class="masonry-grid">
+        {{ range $paginator.Pages }}
+            {{ $image := .Resources.GetMatch "*.jpg" }}
+            {{ if $image }}
+                {{ $thumb := $image.Resize "600x webp q50" }}
+                <a href="{{ .RelPermalink }}" class="grid-item">
+                    <img 
+                        src="{{ $thumb.RelPermalink }}" 
+                        width="{{ $thumb.Width }}" 
+                        height="{{ $thumb.Height }}" 
+                        alt="{{ .Title }}" 
+                        loading="lazy">
+                    
+                    <div class="grid-caption">
+                        <h3>{{ .Title }}</h3>
+                        <p>{{ .Date.Format "Jan 2, 2006" }}</p>
+                    </div>
+                </a>
+            {{ end }}
+        {{ end }}
+    </div>
+</div>
+
+{{/* --- PAGINATION CONTROLS --- */}}
+{{ if gt $paginator.TotalPages 1 }}
+<div class="pagination-container">
+    <div class="pagination">
+        {{ if $paginator.HasPrev }}
+            <a href="{{ $paginator.Prev.URL }}" class="page-link">← Newer</a>
+        {{ else }}
+            <span class="page-link disabled">← Newer</span>
+        {{ end }}
+
+        <span class="page-info">Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</span>
+
+        {{ if $paginator.HasNext }}
+            <a href="{{ $paginator.Next.URL }}" class="page-link">Older →</a>
+        {{ else }}
+            <span class="page-link disabled">Older →</span>
+        {{ end }}
+    </div>
+</div>
+{{ end }}
+
+{{ end }}

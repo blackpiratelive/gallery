@@ -4,7 +4,7 @@
     --text-color: #f0f0f0;
     --text-muted: #888;
     --accent-color: #3b82f6;
-    --cta-color: #eab308; /* Yellow/Gold for the Guestbook */
+    --cta-color: #eab308;
     --cta-text: #000;
     --border-color: #333;
     --gap-size: 16px;
@@ -19,7 +19,7 @@ body {
     line-height: 1.6;
 }
 
-/* --- Header & Navigation --- */
+/* --- Shared Navigation --- */
 .nav-bar {
     padding: 20px 40px;
     display: flex;
@@ -55,7 +55,6 @@ body {
     color: var(--text-color);
 }
 
-/* CTA Button Style */
 .nav-link.btn-cta {
     background-color: var(--cta-color);
     color: var(--cta-text);
@@ -68,10 +67,9 @@ body {
 .nav-link.btn-cta:hover {
     opacity: 0.9;
     transform: translateY(-1px);
-    color: var(--cta-text); /* Ensure text stays black */
+    color: var(--cta-text);
 }
 
-/* Mobile Nav Tweak */
 @media (max-width: 768px) {
     .nav-bar {
         flex-direction: column;
@@ -85,7 +83,23 @@ body {
     }
 }
 
-/* --- Masonry Grid (List Page) --- */
+/* --- Section Headers --- */
+.section-header {
+    max-width: 1400px;
+    margin: 40px auto 10px;
+    padding: 0 20px;
+}
+
+.section-header h2 {
+    font-weight: 300;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+/* --- Masonry Grid --- */
 .masonry-wrapper {
     padding: 20px;
     max-width: 1400px;
@@ -112,6 +126,20 @@ body {
     display: block;
     text-decoration: none;
     color: inherit;
+    position: relative;
+}
+
+/* Featured item distinction */
+.grid-item.featured-item {
+    border: 1px solid rgba(234, 179, 8, 0.3); /* Subtle gold border */
+}
+
+.grid-item.featured-item .grid-caption p {
+    color: var(--cta-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
 }
 
 .grid-item:hover {
@@ -143,12 +171,58 @@ body {
     color: #ccc;
 }
 
+/* --- Pagination Controls (Homepage Bottom) --- */
+.pagination-container {
+    max-width: 1400px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: var(--surface-color);
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+}
+
+.page-link {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.page-link:hover {
+    color: var(--accent-color);
+}
+
+.page-link.disabled {
+    color: var(--text-muted);
+    cursor: default;
+    pointer-events: none;
+}
+
+.page-info {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 0 10px;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+}
+
+
 /* --- Single Page Layout --- */
 .single-container {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
-    min-height: calc(100vh - 85px); /* Adjusted for new header height */
+    min-height: calc(100vh - 85px);
 }
 
 @media (min-width: 900px) {
@@ -188,7 +262,7 @@ body {
 }
 
 .info-content {
-    flex: 1; /* Pushes pagination to bottom if needed */
+    flex: 1; 
 }
 
 .info-section h1 {
@@ -315,4 +389,19 @@ body {
 
 .nav-btn:hover {
     background-color: var(--surface-color);
+}
+
+/* Shared Back Link */
+.back-link {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--text-color);
 }
