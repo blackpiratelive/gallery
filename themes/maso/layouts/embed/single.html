@@ -5,56 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }} | Embed</title>
     
-    <!-- Load Main Styles -->
-    {{ $style := resources.Get "css/style.css" | minify | fingerprint }}
-    <link rel="stylesheet" href="{{ $style.RelPermalink }}">
-
     <style>
-        /* Embed-specific overrides to maximize space */
         body {
-            background-color: transparent; /* Optional: allows blending if iframe is transparent */
-            overflow-x: hidden;
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Hide body scrollbars */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        .masonry-wrapper {
-            padding: 10px; /* Reduced padding for smaller embed areas */
-            max-width: 100%;
+
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 16px;
+            padding: 10px;
+            
+            /* Scrollbar Styling */
+            scrollbar-width: thin;
+            scrollbar-color: #444 transparent;
+            
+            /* Smooth scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
         }
-        /* Ensure links open in the main window, not inside the iframe */
-        .grid-item {
-            cursor: pointer;
+
+        /* Webkit Scrollbar */
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 3px;
+        }
+
+        .scroll-item {
+            flex: 0 0 auto; /* Prevent shrinking */
+            height: 250px;  /* Fixed height for uniformity */
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+            background-color: #1e1e1e;
+        }
+
+        .scroll-item:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .scroll-item img {
+            height: 100%;    /* Fill the fixed height */
+            width: auto;     /* Calculate width automatically */
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Minimal Overlay Caption */
+        .caption-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 30px 10px 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .scroll-item:hover .caption-overlay {
+            opacity: 1;
+        }
+
+        .caption-overlay h3 {
+            margin: 0;
+            color: #f0f0f0;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <div class="masonry-wrapper">
-        <div class="masonry-grid">
-            {{/* Fetch featured pages, sort by weight */}}
-            {{ $featured := where .Site.RegularPages "Params.featured" true }}
-            {{ $featured := $featured.ByWeight }}
+    <div class="scroll-container">
+        {{ $featured := where .Site.RegularPages "Params.featured" true }}
+        {{ $featured := $featured.ByWeight }}
 
-            {{ range $featured }}
-                {{ $image := .Resources.GetMatch "*.jpg" }}
-                {{ if $image }}
-                    {{/* Same processing as homepage */}}
-                    {{ $thumb := $image.Resize "600x webp q50" }}
+        {{ range $featured }}
+            {{ $image := .Resources.GetMatch "*.jpg" }}
+            {{ if $image }}
+                {{/* Resize to fixed height of 250px (x250).
+                    Width is calculated automatically to maintain aspect ratio.
+                */}}
+                {{ $thumb := $image.Resize "x250 webp q50" }}
+                
+                <a href="{{ .RelPermalink }}" target="_blank" class="scroll-item">
+                    <img 
+                        src="{{ $thumb.RelPermalink }}" 
+                        width="{{ $thumb.Width }}" 
+                        height="{{ $thumb.Height }}" 
+                        alt="{{ .Title }}" 
+                        loading="lazy">
                     
-                    {{/* target="_blank" is CRITICAL for embeds so user doesn't get stuck in iframe */}}
-                    <a href="{{ .RelPermalink }}" target="_blank" class="grid-item featured-item">
-                        <img 
-                            src="{{ $thumb.RelPermalink }}" 
-                            width="{{ $thumb.Width }}" 
-                            height="{{ $thumb.Height }}" 
-                            alt="{{ .Title }}" 
-                            loading="lazy">
-                        
-                        <div class="grid-caption">
-                            <h3>{{ .Title }}</h3>
-                        </div>
-                    </a>
-                {{ end }}
+                    <div class="caption-overlay">
+                        <h3>{{ .Title }}</h3>
+                    </div>
+                </a>
             {{ end }}
-        </div>
+        {{ end }}
     </div>
 
 </body>
