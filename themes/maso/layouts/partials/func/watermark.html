@@ -1,0 +1,36 @@
+{{/* Usage: {{ $finalImg := partial "func/watermark.html" (dict "img" $imageResource "resize" "600x webp q50") }}
+*/}}
+
+{{ $src := .img }}
+{{ $param := .resize }}
+
+{{/* 1. Resize the main image first (base layer) */}}
+{{ $img := $src.Resize $param }}
+
+{{/* 2. Load the Watermark file */}}
+{{ $logo := resources.Get "img/watermark.png" }}
+
+{{ if $logo }}
+    {{/* 3. Resize logo to be 20% of the main image's width */}}
+    {{ $logoWidth := div $img.Width 5 }} 
+    {{/* Ensure logo isn't too small (min 50px) */}}
+    {{ if lt $logoWidth 50 }} {{ $logoWidth = 50 }} {{ end }}
+    
+    {{ $logoResizeParam := printf "%dx" $logoWidth }}
+    {{ $logo := $logo.Resize $logoResizeParam }}
+
+    {{/* 4. Calculate Position: Bottom Right with 20px padding */}}
+    {{ $padding := 20 }}
+    {{ $x := sub (sub $img.Width $logo.Width) $padding }}
+    {{ $y := sub (sub $img.Height $logo.Height) $padding }}
+
+    {{/* 5. Ensure x/y aren't negative (for very small images) */}}
+    {{ if lt $x 0 }} {{ $x = 0 }} {{ end }}
+    {{ if lt $y 0 }} {{ $y = 0 }} {{ end }}
+
+    {{/* 6. Apply the Overlay Filter */}}
+    {{ $img = $img | images.Filter (images.Overlay $logo $x $y) }}
+{{ end }}
+
+{{/* 7. Return the processed image */}}
+{{ return $img }}

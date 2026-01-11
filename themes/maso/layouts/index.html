@@ -1,7 +1,6 @@
 {{ define "main" }}
 
 {{/* --- SECTION 1: FEATURED IMAGES --- */}}
-{{/* Fetch pages where featured is true, sort by weight (1, 2, 3...) */}}
 {{ $featured := where .Site.RegularPages "Params.featured" true }}
 {{ $featured := $featured.ByWeight }}
 
@@ -14,7 +13,10 @@
         {{ range $featured }}
             {{ $image := .Resources.GetMatch "*.jpg" }}
             {{ if $image }}
-                {{ $thumb := $image.Resize "600x webp q50" }}
+                
+                {{/* WATERMARK APPLIED HERE */}}
+                {{ $thumb := partial "func/watermark.html" (dict "img" $image "resize" "600x webp q50") }}
+
                 <a href="{{ .RelPermalink }}" class="grid-item featured-item">
                     <img 
                         src="{{ $thumb.RelPermalink }}" 
@@ -35,13 +37,11 @@
 {{ end }}
 
 
-{{/* --- SECTION 2: ALL IMAGES (PAGINATED) --- */}}
-{{/* Fetch pages where featured is NOT true to avoid duplicates */}}
+{{/* --- SECTION 2: LATEST GALLERY --- */}}
 {{ $regular := where .Site.RegularPages "Params.featured" "!=" true }}
-{{/* Sort by Date (newest first) */}}
 {{ $regular := $regular.ByDate.Reverse }}
 
-{{/* Configure Pagination: 25 items per page */}}
+{{/* Pagination: 25 items per page */}}
 {{ $paginator := .Paginate $regular 25 }}
 
 <div class="section-header">
@@ -53,7 +53,10 @@
         {{ range $paginator.Pages }}
             {{ $image := .Resources.GetMatch "*.jpg" }}
             {{ if $image }}
-                {{ $thumb := $image.Resize "600x webp q50" }}
+                
+                {{/* WATERMARK APPLIED HERE */}}
+                {{ $thumb := partial "func/watermark.html" (dict "img" $image "resize" "600x webp q50") }}
+
                 <a href="{{ .RelPermalink }}" class="grid-item">
                     <img 
                         src="{{ $thumb.RelPermalink }}" 
