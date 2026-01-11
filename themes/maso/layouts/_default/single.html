@@ -15,115 +15,134 @@
 
     <!-- Right Side: Details -->
     <div class="info-section">
-        <h1>{{ .Title }}</h1>
         
-        {{ with .Params.album }}
-            <span class="subtitle">Album: {{ . }}</span>
-        {{ end }}
-        
-        <div class="description">
-            {{ .Content }}
-        </div>
-
-        {{ if .Params.tags }}
-        <div class="tags">
-            {{ range .Params.tags }}
-                <span class="tag">{{ . }}</span>
+        <div class="info-content">
+            <h1>{{ .Title }}</h1>
+            
+            {{ with .Params.album }}
+                <span class="subtitle">Album: {{ . }}</span>
             {{ end }}
-        </div>
-        {{ end }}
+            
+            <div class="description">
+                {{ .Content }}
+            </div>
 
-        <!-- EXIF DATA EXTRACTION -->
-        {{ if $image }}
-            {{ with $image.Exif }}
-            <div class="exif-container">
-                <div class="exif-header">Camera Data (EXIF)</div>
-                <div class="exif-grid">
-                    
-                    <!-- Camera Model -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            Camera
-                        </span>
-                        <span class="exif-value">{{ .Tags.Model | default "N/A" }}</span>
-                    </div>
-
-                    <!-- Lens (LensModel is sometimes missing in basic EXIF, falling back to LensID or blank) -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                            Lens
-                        </span>
-                        <span class="exif-value">{{ .Tags.LensModel | default "Unknown Lens" }}</span>
-                    </div>
-
-                    <!-- Aperture (FNumber) -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>
-                            Aperture
-                        </span>
-                        <span class="exif-value">f/{{ .Tags.FNumber }}</span>
-                    </div>
-
-                    <!-- ISO -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                            ISO
-                        </span>
-                        <span class="exif-value">{{ .Tags.ISOSpeedRatings }}</span>
-                    </div>
-
-                    <!-- Shutter Speed (ExposureTime) -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            Shutter
-                        </span>
-                        <!-- Hugo usually formats this nicely, but raw it might be decimal -->
-                        <span class="exif-value">{{ .Tags.ExposureTime }}s</span>
-                    </div>
-
-                    <!-- Focal Length -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                            Focal Length
-                        </span>
-                        <span class="exif-value">{{ .Tags.FocalLength }}mm</span>
-                    </div>
-
-                    <!-- Dimensions -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                            Dimensions
-                        </span>
-                        <span class="exif-value">{{ .Tags.PixelXDimension }} x {{ .Tags.PixelYDimension }}</span>
-                    </div>
-
-                    <!-- Date Taken -->
-                    <div class="exif-item">
-                        <span class="exif-label">
-                            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            Date Taken
-                        </span>
-                        <span class="exif-value">{{ .Date.Format "Jan 02, 2006" }}</span>
-                    </div>
-
-                </div>
+            {{ if .Params.tags }}
+            <div class="tags">
+                {{ range .Params.tags }}
+                    <span class="tag">{{ . }}</span>
+                {{ end }}
             </div>
             {{ end }}
-        {{ end }}
 
-        <div class="actions">
+            <!-- EXIF DATA EXTRACTION -->
             {{ if $image }}
-            <a href="{{ $image.RelPermalink }}" download class="btn">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                Download Original
-            </a>
+                {{ with $image.Exif }}
+                <div class="exif-container">
+                    <div class="exif-header">Camera Data (EXIF)</div>
+                    <div class="exif-grid">
+                        
+                        <!-- Camera -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                Camera
+                            </span>
+                            <span class="exif-value">{{ .Tags.Model | default "N/A" }}</span>
+                        </div>
+
+                        <!-- Lens -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                                Lens
+                            </span>
+                            <span class="exif-value">{{ .Tags.LensModel | default "Unknown Lens" }}</span>
+                        </div>
+
+                        <!-- Aperture -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>
+                                Aperture
+                            </span>
+                            <span class="exif-value">f/{{ .Tags.FNumber }}</span>
+                        </div>
+
+                        <!-- ISO -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                                ISO
+                            </span>
+                            <span class="exif-value">{{ .Tags.ISOSpeedRatings }}</span>
+                        </div>
+
+                        <!-- Shutter -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Shutter
+                            </span>
+                            <span class="exif-value">{{ .Tags.ExposureTime }}s</span>
+                        </div>
+
+                        <!-- Focal Length -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                Focal Length
+                            </span>
+                            <span class="exif-value">{{ .Tags.FocalLength }}mm</span>
+                        </div>
+
+                         <!-- Dimensions -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                                Dimensions
+                            </span>
+                            <span class="exif-value">{{ .Tags.PixelXDimension }} x {{ .Tags.PixelYDimension }}</span>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="exif-item">
+                            <span class="exif-label">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Date Taken
+                            </span>
+                            <span class="exif-value">{{ .Date.Format "Jan 02, 2006" }}</span>
+                        </div>
+
+                    </div>
+                </div>
+                {{ end }}
+            {{ end }}
+
+            <div class="actions">
+                {{ if $image }}
+                <a href="{{ $image.RelPermalink }}" download class="btn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download Original
+                </a>
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- Next / Prev Navigation -->
+        <div class="page-navigation">
+            {{ if .NextInSection }}
+                <a href="{{ .NextInSection.RelPermalink }}" class="nav-btn prev">
+                    ← {{ .NextInSection.Title }}
+                </a>
+            {{ else }}
+                <span></span> <!-- Spacer to keep layout balanced if only Next exists -->
+            {{ end }}
+
+            {{ if .PrevInSection }}
+                <a href="{{ .PrevInSection.RelPermalink }}" class="nav-btn next">
+                    {{ .PrevInSection.Title }} →
+                </a>
             {{ end }}
         </div>
     </div>

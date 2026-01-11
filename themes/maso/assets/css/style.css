@@ -4,6 +4,8 @@
     --text-color: #f0f0f0;
     --text-muted: #888;
     --accent-color: #3b82f6;
+    --cta-color: #eab308; /* Yellow/Gold for the Guestbook */
+    --cta-text: #000;
     --border-color: #333;
     --gap-size: 16px;
 }
@@ -17,13 +19,14 @@ body {
     line-height: 1.6;
 }
 
-/* --- Shared Navigation --- */
+/* --- Header & Navigation --- */
 .nav-bar {
     padding: 20px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-color);
 }
 
 .site-title {
@@ -35,18 +38,51 @@ body {
     text-decoration: none;
 }
 
-.back-link {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+.nav-menu {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.95rem;
     transition: color 0.2s;
 }
 
-.back-link:hover {
+.nav-link:hover {
     color: var(--text-color);
+}
+
+/* CTA Button Style */
+.nav-link.btn-cta {
+    background-color: var(--cta-color);
+    color: var(--cta-text);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.nav-link.btn-cta:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    color: var(--cta-text); /* Ensure text stays black */
+}
+
+/* Mobile Nav Tweak */
+@media (max-width: 768px) {
+    .nav-bar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+    .nav-menu {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
 
 /* --- Masonry Grid (List Page) --- */
@@ -73,7 +109,7 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: block; /* For anchor tag wrapper */
+    display: block;
     text-decoration: none;
     color: inherit;
 }
@@ -112,7 +148,7 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
-    min-height: calc(100vh - 74px); /* Approx nav height */
+    min-height: calc(100vh - 85px); /* Adjusted for new header height */
 }
 
 @media (min-width: 900px) {
@@ -121,9 +157,9 @@ body {
     }
     
     .image-section {
-        height: calc(100vh - 74px);
+        height: calc(100vh - 85px);
         position: sticky;
-        top: 74px; /* Sticks below header */
+        top: 85px;
         overflow: hidden;
         background-color: #000;
         display: flex;
@@ -134,8 +170,7 @@ body {
     .info-section {
         padding: 60px;
         overflow-y: auto;
-        /* Ensure it scrolls if content is long */
-        max-height: calc(100vh - 74px); 
+        max-height: calc(100vh - 85px); 
     }
 }
 
@@ -148,6 +183,12 @@ body {
 .info-section {
     padding: 30px;
     background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.info-content {
+    flex: 1; /* Pushes pagination to bottom if needed */
 }
 
 .info-section h1 {
@@ -246,4 +287,32 @@ body {
     gap: 8px;
     background-color: var(--text-color);
     color: var(--bg-color);
+}
+
+/* --- Page Navigation (Next/Prev) --- */
+.page-navigation {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    max-width: 45%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-btn:hover {
+    background-color: var(--surface-color);
 }
