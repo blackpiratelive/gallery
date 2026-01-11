@@ -4,21 +4,22 @@
         {{ range .Pages }}
             <!-- Find the first JPG image in the bundle -->
             {{ $image := .Resources.GetMatch "*.jpg" }}
-            <!-- Or try jpeg, png if needed: .Resources.GetMatch "*{.jpg,.jpeg,.png}" -->
             
             {{ if $image }}
-                <!-- Link wrapper to make the whole card clickable -->
+                <!-- 
+                   Create Thumbnail:
+                   1. Resize to 600px width (maintains aspect ratio)
+                   2. Convert to WebP
+                   3. Set Quality to 50%
+                -->
+                {{ $thumb := $image.Resize "600x webp q50" }}
+
+                <!-- Link wrapper points to the single page -->
                 <a href="{{ .RelPermalink }}" class="grid-item">
-                    <!-- 
-                        Hugo Image Processing:
-                        You can resize images here for thumbnails if original is too huge:
-                        {{ $thumb := $image.Resize "600x" }}
-                        But using original for now as requested.
-                    -->
                     <img 
-                        src="{{ $image.RelPermalink }}" 
-                        width="{{ $image.Width }}" 
-                        height="{{ $image.Height }}" 
+                        src="{{ $thumb.RelPermalink }}" 
+                        width="{{ $thumb.Width }}" 
+                        height="{{ $thumb.Height }}" 
                         alt="{{ .Title }}" 
                         loading="lazy">
                     
