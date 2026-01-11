@@ -7,154 +7,119 @@
     
     <style>
         body {
-            /* Match the fade color */
-            background-color: transparent; 
+            background-color: transparent;
             margin: 0;
             padding: 0;
-            overflow: hidden; 
+            overflow: hidden; /* Strictly no scrolling */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .embed-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        .embed-grid {
+            display: grid;
+            gap: 12px;
+            padding: 10px;
+            /* Default (Mobile): 2 Columns */
+            grid-template-columns: repeat(2, 1fr);
         }
 
-        .scroll-container {
-            display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            gap: 16px;
-            padding: 10px 20px 10px 10px; /* Extra padding right for the fade */
-            
-            /* Scrollbar Styling */
-            scrollbar-width: thin;
-            scrollbar-color: #555 transparent;
-            cursor: grab;
-            
-            /* Smooth scrolling */
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-
-        .scroll-container:active {
-            cursor: grabbing;
-        }
-
-        /* Webkit Scrollbar */
-        .scroll-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .scroll-container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-        .scroll-container::-webkit-scrollbar-thumb {
-            background-color: #555;
-            border-radius: 4px;
-        }
-        .scroll-container::-webkit-scrollbar-thumb:hover {
-            background-color: #777;
-        }
-
-        .scroll-item {
-            flex: 0 0 auto;
-            height: 250px;  /* Fixed height */
+        .grid-item {
+            /* Fixed height ensures perfect grid alignment and predictable iframe height */
+            height: 180px; 
             border-radius: 8px;
             overflow: hidden;
             position: relative;
-            text-decoration: none;
-            transition: transform 0.2s ease, opacity 0.2s;
-            background-color: #1e1e1e;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .scroll-item:hover {
-            transform: scale(1.02);
-            z-index: 10;
-        }
-
-        .scroll-item img {
-            height: 100%;
-            width: auto;
             display: block;
-            object-fit: cover;
+            text-decoration: none;
+            background-color: #1e1e1e;
         }
 
-        /* Caption Overlay */
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Crops image to fill the square/rectangle */
+            transition: transform 0.3s ease;
+            display: block;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Caption Overlay on Hover */
         .caption-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            padding: 30px 10px 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 20px 8px 8px;
             opacity: 0;
             transition: opacity 0.2s;
         }
 
-        .scroll-item:hover .caption-overlay {
+        .grid-item:hover .caption-overlay {
             opacity: 1;
         }
 
         .caption-overlay h3 {
             margin: 0;
-            color: #f0f0f0;
-            font-size: 0.9rem;
+            color: #fff;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
-        /* VISUAL CUE: Right Side Fade 
-           This creates a shadow on the right edge to indicate more content.
-           It uses pointer-events: none so you can still click/scroll through it.
-        */
-        .scroll-cue-overlay {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 16px; /* Stop above scrollbar */
-            width: 60px;
-            background: linear-gradient(to right, transparent, #121212);
-            pointer-events: none;
-            z-index: 20;
+        /* --- LOGIC: Mobile vs Desktop Item Count --- */
+        
+        /* Mobile: Show only first 4 items (2 rows of 2) */
+        .grid-item:nth-child(n+5) {
+            display: none;
+        }
+
+        /* Desktop: Show 6 items (2 rows of 3) */
+        @media (min-width: 768px) {
+            .embed-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            /* Reveal items 5 and 6 on desktop */
+            .grid-item:nth-child(n+5) {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="embed-wrapper">
-        <div class="scroll-container">
-            {{ $featured := where .Site.RegularPages "Params.featured" true }}
-            {{ $featured := $featured.ByWeight }}
+    <div class="embed-grid">
+        {{/* Fetch up to 6 featured images.
+           CSS handles hiding the extra 2 on mobile.
+        */}}
+        {{ $featured := where .Site.RegularPages "Params.featured" true }}
+        {{ $featured := $featured.ByWeight | first 6 }}
 
-            {{ range $featured }}
-                {{ $image := .Resources.GetMatch "*.jpg" }}
-                {{ if $image }}
-                    {{/* Resize to fixed height of 250px. Width calculates automatically. */}}
-                    {{ $thumb := $image.Resize "x250 webp q50" }}
+        {{ range $featured }}
+            {{ $image := .Resources.GetMatch "*.jpg" }}
+            {{ if $image }}
+                {{/* High Compression:
+                   - 400px width (sufficient for 3-col grid)
+                   - WebP format
+                   - Quality 40% (Aggressive compression)
+                */}}
+                {{ $thumb := $image.Resize "400x webp q40" }}
+                
+                <a href="{{ .RelPermalink }}" target="_blank" class="grid-item">
+                    <img 
+                        src="{{ $thumb.RelPermalink }}" 
+                        width="{{ $thumb.Width }}" 
+                        height="{{ $thumb.Height }}" 
+                        alt="{{ .Title }}" 
+                        loading="lazy">
                     
-                    <a href="{{ .RelPermalink }}" target="_blank" class="scroll-item">
-                        <img 
-                            src="{{ $thumb.RelPermalink }}" 
-                            width="{{ $thumb.Width }}" 
-                            height="{{ $thumb.Height }}" 
-                            alt="{{ .Title }}" 
-                            loading="lazy">
-                        
-                        <div class="caption-overlay">
-                            <h3>{{ .Title }}</h3>
-                        </div>
-                    </a>
-                {{ end }}
+                    <div class="caption-overlay">
+                        <h3>{{ .Title }}</h3>
+                    </div>
+                </a>
             {{ end }}
-            
-            <!-- Spacer at the end so the last item isn't covered by the fade -->
-            <div style="flex: 0 0 20px;"></div>
-        </div>
-        
-        <!-- The visual gradient overlay -->
-        <div class="scroll-cue-overlay"></div>
+        {{ end }}
     </div>
 
 </body>
