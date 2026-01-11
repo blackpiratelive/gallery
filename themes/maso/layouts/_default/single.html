@@ -7,7 +7,12 @@
     <!-- Left Side: Image -->
     <div class="image-section">
         {{ if $image }}
-            <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}">
+            
+            {{/* WATERMARK THE VIEWABLE IMAGE */}}
+            {{/* Usage: partial "func/watermark.html" (dict "img" resource "resize" "params") */}}
+            {{ $displayImage := partial "func/watermark.html" (dict "img" $image "resize" "1200x webp q90") }}
+
+            <img src="{{ $displayImage.RelPermalink }}" alt="{{ .Title }}">
         {{ else }}
             <p style="color:white;">Image not found</p>
         {{ end }}
@@ -121,6 +126,11 @@
 
             <div class="actions">
                 {{ if $image }}
+                <!-- 
+                   Downloads the CLEAN Original. 
+                   If you want to download a watermarked version, replace href with:
+                   href="{{ (partial "func/watermark.html" (dict "img" $image "resize" "2500x q90")).RelPermalink }}"
+                -->
                 <a href="{{ $image.RelPermalink }}" download class="btn">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Download Original
