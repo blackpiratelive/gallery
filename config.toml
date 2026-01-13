@@ -11,3 +11,6 @@ theme = "maso"
 [taxonomies]
   album = "albums"
   tag = "tags" # You can keep this if you still want to use tags elsewhere
+  
+[outputs]
+  home = ["JSON"]
