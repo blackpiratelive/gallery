@@ -3,21 +3,20 @@
 {{- range .Pages.ByDate.Reverse -}}
   {{- $page := . -}}
   {{- with .Resources.GetMatch "*.{jpg,jpeg,png,JPG,JPEG,PNG}" -}}
-    {{- $thumb := . | images.Resize "600x q30 webp" -}}
+  
+    {{/* FIX IS HERE: Call .Resize directly on the found resource */}}
+    {{- $thumb := .Resize "600x q30 webp" -}}
     
-    {{/* Create a dictionary (object) for this page */}}
     {{- $item := dict 
       "title" $page.Title
       "date" ($page.Date.Format "2006-01-02")
-      "tags" $page.Params.tags
-      "album" $page.Params.album
+      "tags" ($page.Params.tags | default slice)
+      "album" ($page.Params.album | default "")
       "image" (dict "original" .Permalink "thumbnail" $thumb.Permalink)
     -}}
     
-    {{/* Append to the output slice */}}
     {{- $output = $output | append $item -}}
   {{- end -}}
 {{- end -}}
 
-{{/* Output the final JSON */}}
 {{- $output | jsonify -}}
