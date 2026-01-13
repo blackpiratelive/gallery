@@ -1,18 +1,23 @@
-[
-{{- $pages := .Pages.ByDate.Reverse -}}
-{{- range $i, $p := $pages -}}
-  {{- with $p.Resources.GetMatch "*.{jpg,jpeg,png,JPG,JPEG,PNG}" -}}
+{{- $output := slice -}}
+
+{{- range .Pages.ByDate.Reverse -}}
+  {{- $page := . -}}
+  {{- with .Resources.GetMatch "*.{jpg,jpeg,png,JPG,JPEG,PNG}" -}}
     {{- $thumb := . | images.Resize "600x q30 webp" -}}
-    {
-      "title": {{ $p.Title | jsonify }},
-      "date": {{ $p.Date.Format "2006-01-02" | jsonify }},
-      "tags": {{ $p.Params.tags | jsonify }},
-      "album": {{ $p.Params.album | jsonify }},
-      "image": {
-        "original": {{ .Permalink | jsonify }},
-        "thumbnail": {{ $thumb.Permalink | jsonify }}
-      }
-    }{{ if lt (add $i 1) (len $pages) }},{{ end }}
+    
+    {{/* Create a dictionary (object) for this page */}}
+    {{- $item := dict 
+      "title" $page.Title
+      "date" ($page.Date.Format "2006-01-02")
+      "tags" $page.Params.tags
+      "album" $page.Params.album
+      "image" (dict "original" .Permalink "thumbnail" $thumb.Permalink)
+    -}}
+    
+    {{/* Append to the output slice */}}
+    {{- $output = $output | append $item -}}
   {{- end -}}
-{{- end }}
-]
+{{- end -}}
+
+{{/* Output the final JSON */}}
+{{- $output | jsonify -}}

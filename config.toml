@@ -13,4 +13,5 @@ theme = "maso"
   tag = "tags" # You can keep this if you still want to use tags elsewhere
   
 [outputs]
-  home = ["HTML" , "JSON"]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS", "JSON"]
