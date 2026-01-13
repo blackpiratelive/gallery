@@ -22,9 +22,9 @@
     {{/* --- BUILD ITEM --- */}}
     {{- $item := dict 
       "title" $page.Title
-      "date" ($page.Date.Format "2006-01-02")
-      "featured" ($page.Params.featured | default false)  
-      "weight" ($page.Weight | default 0)                 
+      "date" ($page.Date.Format "2006-01-02T15:04:05-07:00") 
+      "featured" ($page.Params.featured | default false)
+      "weight" ($page.Weight | default 0)
       "description" $page.Content
       "tags" ($page.Params.tags | default slice)
       "album" ($page.Params.album | default "")
