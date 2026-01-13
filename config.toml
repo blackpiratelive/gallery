@@ -13,4 +13,4 @@ theme = "maso"
   tag = "tags" # You can keep this if you still want to use tags elsewhere
   
 [outputs]
-  home = ["JSON"]
+  home = ["HTML" , "JSON"]
