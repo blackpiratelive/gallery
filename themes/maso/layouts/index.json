@@ -23,8 +23,8 @@
     {{- $item := dict 
       "title" $page.Title
       "date" ($page.Date.Format "2006-01-02")
-      "featured" ($page.Params.featured | default false)  {{/* Boolean */}}
-      "weight" ($page.Weight | default 0)                 {{/* Integer */}}
+      "featured" ($page.Params.featured | default false)  
+      "weight" ($page.Weight | default 0)                 
       "description" $page.Content
       "tags" ($page.Params.tags | default slice)
       "album" ($page.Params.album | default "")
