@@ -3,16 +3,42 @@
 {{- range .Pages.ByDate.Reverse -}}
   {{- $page := . -}}
   {{- with .Resources.GetMatch "*.{jpg,jpeg,png,JPG,JPEG,PNG}" -}}
-  
-    {{/* FIX IS HERE: Call .Resize directly on the found resource */}}
+    {{- $original := . -}}
     {{- $thumb := .Resize "600x q30 webp" -}}
     
+    {{/* --- EXTRACT EXIF --- */}}
+    {{- $exifData := dict -}}
+    {{- with .Exif -}}
+      {{- $exifData = dict 
+        "model" .Tags.Model
+        "iso" .Tags.ISOSpeedRatings
+        "fstop" .Tags.FNumber
+        "shutter" .Tags.ExposureTime
+        "focalLength" .Tags.FocalLength
+        "time" .Tags.DateTimeOriginal
+      -}}
+    {{- end -}}
+
+    {{/* --- BUILD ITEM --- */}}
     {{- $item := dict 
       "title" $page.Title
       "date" ($page.Date.Format "2006-01-02")
+      "description" $page.Content   {{/* <--- CHANGED: Uses rendered HTML content */}}
       "tags" ($page.Params.tags | default slice)
       "album" ($page.Params.album | default "")
-      "image" (dict "original" .Permalink "thumbnail" $thumb.Permalink)
+      "exif" $exifData
+      "image" (dict 
+        "original" (dict 
+            "url" $original.Permalink 
+            "width" $original.Width 
+            "height" $original.Height
+        ) 
+        "thumbnail" (dict 
+            "url" $thumb.Permalink 
+            "width" $thumb.Width 
+            "height" $thumb.Height
+        )
+      )
     -}}
     
     {{- $output = $output | append $item -}}
