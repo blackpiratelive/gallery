@@ -1,17 +1,18 @@
 [
-{{- $pages := .Pages -}}
+{{- $pages := .Pages.ByDate.Reverse -}}
 {{- range $i, $p := $pages -}}
-  {{- $img := $p.Resources.GetMatch "*.{jpg,jpeg,png}" -}}
-  {{- $thumb := $img | images.Resize "600x q30 webp" -}}
-  {
-    "title": {{ $p.Title | jsonify }},
-    "date": {{ $p.Date.Format "2006-01-02" | jsonify }},
-    "tags": {{ $p.Params.tags | jsonify }},
-    "album": {{ $p.Params.album | jsonify }},
-    "image": {
-      "original": {{ $img.Permalink | jsonify }},
-      "thumbnail": {{ $thumb.Permalink | jsonify }}
-    }
-  }{{ if lt (add $i 1) (len $pages) }},{{ end }}
+  {{- with $p.Resources.GetMatch "*.{jpg,jpeg,png,JPG,JPEG,PNG}" -}}
+    {{- $thumb := . | images.Resize "600x q30 webp" -}}
+    {
+      "title": {{ $p.Title | jsonify }},
+      "date": {{ $p.Date.Format "2006-01-02" | jsonify }},
+      "tags": {{ $p.Params.tags | jsonify }},
+      "album": {{ $p.Params.album | jsonify }},
+      "image": {
+        "original": {{ .Permalink | jsonify }},
+        "thumbnail": {{ $thumb.Permalink | jsonify }}
+      }
+    }{{ if lt (add $i 1) (len $pages) }},{{ end }}
+  {{- end -}}
 {{- end }}
 ]
